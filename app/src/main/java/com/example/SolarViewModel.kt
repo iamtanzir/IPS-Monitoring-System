@@ -114,6 +114,64 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
     private val _metrics = MutableStateFlow(SolarMetrics())
     val metrics: StateFlow<SolarMetrics> = _metrics.asStateFlow()
 
+    // IoT Pairing variables
+    private val _isPaired = MutableStateFlow(prefs.getBoolean("is_paired", true)) // Default to true so existing demo works out-of-the-box
+    val isPaired: StateFlow<Boolean> = _isPaired.asStateFlow()
+
+    private val _pairedDeviceId = MutableStateFlow(prefs.getString("paired_device_id", "ESP32_HYBRID_IPS_04B") ?: "ESP32_HYBRID_IPS_04B")
+    val pairedDeviceId: StateFlow<String> = _pairedDeviceId.asStateFlow()
+
+    private val _isScanning = MutableStateFlow(false)
+    val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
+
+    private val _scannedDevices = MutableStateFlow<List<String>>(emptyList())
+    val scannedDevices: StateFlow<List<String>> = _scannedDevices.asStateFlow()
+
+    fun startBleScan() {
+        viewModelScope.launch {
+            _isScanning.value = true
+            _scannedDevices.value = emptyList()
+            kotlinx.coroutines.delay(1000)
+            _scannedDevices.value = listOf(
+                "ESP32_HYBRID_IPS_04B",
+                "SMART_SOLAR_PLUG_X8",
+                "HYBRID_INVERTER_91G"
+            )
+            kotlinx.coroutines.delay(1500)
+            _isScanning.value = false
+        }
+    }
+
+    fun pairDevice(deviceId: String, wifiSsid: String, wifiPass: String) {
+        prefs.edit().apply {
+            putBoolean("is_paired", true)
+            putString("paired_device_id", deviceId)
+            putString("wifi_ssid", wifiSsid)
+            putString("wifi_pass", wifiPass)
+            apply()
+        }
+        _isPaired.value = true
+        _pairedDeviceId.value = deviceId
+        // Update custom name automatically based on pairing
+        saveSettings(_settings.value.copy(
+            customSolarName = "Smart IoT ($deviceId)",
+            deviceSerialNumber = "IPS-DSP-2026-" + deviceId.takeLast(3).uppercase()
+        ))
+    }
+
+    fun unpairDevice() {
+        prefs.edit().apply {
+            putBoolean("is_paired", false)
+            putString("paired_device_id", "")
+            putString("wifi_ssid", "")
+            putString("wifi_pass", "")
+            apply()
+        }
+        _isPaired.value = false
+        _pairedDeviceId.value = ""
+        saveSettings(_settings.value.copy(customSolarName = "Unpaired Monitor Mode"))
+    }
+
     // Configuration/Customization settings flow
     private val _settings = MutableStateFlow(CustomizerSettings())
     val settings: StateFlow<CustomizerSettings> = _settings.asStateFlow()

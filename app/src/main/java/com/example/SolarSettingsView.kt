@@ -1,5 +1,6 @@
 package com.example
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +28,11 @@ fun SolarSettingsView(
     modifier: Modifier = Modifier
 ) {
     val settings by viewModel.settings.collectAsState()
+    val isPaired by viewModel.isPaired.collectAsState()
+    val pairedDeviceId by viewModel.pairedDeviceId.collectAsState()
+    val isScanning by viewModel.isScanning.collectAsState()
+    val scannedDevices by viewModel.scannedDevices.collectAsState()
+
     val scrollState = rememberScrollState()
 
     var editedName by remember(settings.customSolarName) { mutableStateOf(settings.customSolarName) }
@@ -38,6 +44,10 @@ fun SolarSettingsView(
     var limitVoltage by remember(settings.maxVoltageLimit) { mutableStateOf(settings.maxVoltageLimit) }
     var limitCurrent by remember(settings.maxCurrentLimit) { mutableStateOf(settings.maxCurrentLimit) }
     var limitLowBattery by remember(settings.lowBatteryAlertLimit) { mutableStateOf(settings.lowBatteryAlertLimit) }
+
+    // Provisioning states
+    var provisionSsid by remember { mutableStateOf("Mehedy_Home_WiFi") }
+    var provisionPass by remember { mutableStateOf("bangladesh2026") }
 
     // DSP/IPS state variables
     var editedSerialId by remember(settings.deviceSerialNumber) { mutableStateOf(settings.deviceSerialNumber) }
@@ -101,6 +111,222 @@ fun SolarSettingsView(
                     }
                     ColorAccentButton(color = SolarRed, label = "Cyber Red", isSelected = settings.selectedAccentHex == "#FF1744") {
                         viewModel.saveSettings(settings.copy(selectedAccentHex = "#FF1744"))
+                    }
+                }
+            }
+        }
+
+        // 1.5 Real IoT Gateway Bluetooth/Wi-Fi Provisioning & Pairing Card
+        Card(
+            colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+            border = CardBorder(if (isPaired) SolarGreen.copy(alpha = 0.5f) else SolarGold.copy(alpha = 0.5f)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (isPaired) Icons.Default.BluetoothConnected else Icons.Default.BluetoothSearching,
+                            contentDescription = "IoT Pair",
+                            tint = if (isPaired) SolarGreen else SolarGold,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "ESP32 IoT Inverter Pairing",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (isPaired) SolarGreen.copy(alpha = 0.12f) else SolarGold.copy(alpha = 0.12f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = if (isPaired) "PAIRED & ONLINE" else "OFFLINE / DISCONNECTED",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isPaired) SolarGreen else SolarGold
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "স্মার্ট আইওটি প্লাগের মতো আপনার হাইব্রিড ইনভার্টার বা আইপিএস-এর সাথে ব্লুটুথ ও লোকাল ওয়াই-ফাই দিয়ে প্রথমবার পেয়ারিং সম্পন্ন করুন। একবার কানেক্ট করলে যেকোনো জায়গা থেকে ক্লাউড মনিটরিং করা যাবে।",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    fontSize = 11.sp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (isPaired) {
+                    // Paired view
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(SolarBgDark, RoundedCornerShape(12.dp))
+                            .border(1.dp, SolarBorder, RoundedCornerShape(12.dp))
+                            .padding(12.dp)
+                    ) {
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Devices, contentDescription = "Device", tint = SolarGreen, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Connected Device: $pairedDeviceId",
+                                    color = TextPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Telemetry Route: MQTT Broker -> $editedBroker -> mehedy/solar/$pairedDeviceId",
+                                color = TextSecondary,
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { viewModel.unpairDevice() },
+                        colors = ButtonDefaults.buttonColors(containerColor = SolarRed.copy(alpha = 0.85f)),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Unpair", tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Unpair & Disconnect System", fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                } else {
+                    // Unpaired view: scan and input credentials
+                    Text(
+                        text = "Step 1: Enter local Router Wi-Fi Credentials",
+                        fontWeight = FontWeight.Bold,
+                        color = SolarCyan,
+                        fontSize = 11.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = provisionSsid,
+                        onValueChange = { provisionSsid = it },
+                        label = { Text("Local Wi-Fi SSID (Router Name)", color = TextSecondary) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = SolarCyan,
+                            unfocusedBorderColor = SolarBorder
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = provisionPass,
+                        onValueChange = { provisionPass = it },
+                        label = { Text("Local Wi-Fi WPA2 Password", color = TextSecondary) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = SolarCyan,
+                            unfocusedBorderColor = SolarBorder
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Step 2: Scan & Select ESP32 Inverter over BLE",
+                        fontWeight = FontWeight.Bold,
+                        color = SolarCyan,
+                        fontSize = 11.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (isScanning) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = SolarGold, strokeWidth = 2.dp)
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text("Scanning for Hybrid Inverters via BLE...", color = TextSecondary, fontSize = 11.sp)
+                            }
+                        }
+                    } else if (scannedDevices.isEmpty()) {
+                        Button(
+                            onClick = { viewModel.startBleScan() },
+                            colors = ButtonDefaults.buttonColors(containerColor = SolarGold),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Search, contentDescription = "Scan", tint = Color.Black)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Scan for Inverter Bluetooth Gateways", fontWeight = FontWeight.Bold, color = Color.Black)
+                        }
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            scannedDevices.forEach { devId ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(SolarBgDark, RoundedCornerShape(10.dp))
+                                        .border(1.dp, SolarBorder, RoundedCornerShape(10.dp))
+                                        .clickable {
+                                            viewModel.pairDevice(
+                                                deviceId = devId,
+                                                wifiSsid = provisionSsid,
+                                                wifiPass = provisionPass
+                                            )
+                                        }
+                                        .padding(12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.Bluetooth, contentDescription = "BLE", tint = SolarGold, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Column {
+                                            Text(devId, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                            Text("Ready to provision & bind", color = TextSecondary, fontSize = 9.sp)
+                                        }
+                                    }
+                                    Text(
+                                        text = "PAIR & CONFIG",
+                                        color = SolarCyan,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            OutlinedButton(
+                                onClick = { viewModel.startBleScan() },
+                                border = BorderStroke(1.dp, SolarBorder),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Rescan BLE Gateways", fontSize = 10.sp, color = TextPrimary)
+                            }
+                        }
                     }
                 }
             }
