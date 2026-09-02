@@ -451,7 +451,7 @@ fun SolarHomeView(
                     modifier = Modifier.padding(start = 4.dp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                LiveFlowDiagramCard(metrics = metrics, accentColor = accentColor)
+                LiveFlowDiagramCard(metrics = metrics, accentColor = accentColor, settings = settings)
             }
         }
 
@@ -617,7 +617,8 @@ fun SolarHomeView(
 @Composable
 fun LiveFlowDiagramCard(
     metrics: SolarMetrics,
-    accentColor: Color
+    accentColor: Color,
+    settings: CustomizerSettings
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = SolarCardBg),
@@ -882,15 +883,26 @@ fun LiveFlowDiagramCard(
                         fontWeight = FontWeight.ExtraBold,
                         color = if (metrics.isSolarOn) SolarGold else TextSecondary
                     )
-                    Text("DC Input", fontSize = 8.sp, color = TextSecondary)
+                    Text(
+                        text = if (metrics.isSolarOn) "${metrics.panelVoltage}V • ${metrics.panelCurrent}A" else "0V • 0A",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                    Text("DC Solar Input", fontSize = 7.sp, color = TextSecondary)
                 }
             }
 
             // 2. GRID / BYPASS NODE (Top Right)
+            val isGridActive = true
+            val gridVoltage = 220f
+            val gridPower = if (metrics.isLoadOn) (metrics.loadPower + 120f) else 120f
+            val gridCurrent = gridPower / gridVoltage
+
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(16.dp),
-                border = CardBorder(SolarBorder),
+                border = CardBorder(if (isGridActive) SolarGreen.copy(alpha = 0.5f) else SolarBorder),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .size(cardW, cardH)
@@ -903,13 +915,24 @@ fun LiveFlowDiagramCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Power, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Power, contentDescription = null, tint = SolarGreen, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("GRID LINE", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        Text("AC GRID", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("0.0 kW", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Color.Gray)
-                    Text("Off Grid", fontSize = 8.sp, color = SolarRed, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "${gridPower.toInt()} W",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = SolarGreen
+                    )
+                    Text(
+                        text = "220V • ${String.format("%.2f", gridCurrent)}A",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                    Text("Grid Online", fontSize = 8.sp, color = SolarGreen, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -967,7 +990,15 @@ fun LiveFlowDiagramCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("BATTERY CELLS", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = settings.batteryTypeSelected,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF00ACC1),
+                        maxLines = 1,
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     // Physical fluid screen layout
                     Box(
@@ -1075,7 +1106,13 @@ fun LiveFlowDiagramCard(
                         fontWeight = FontWeight.ExtraBold,
                         color = if (metrics.isLoadOn) SolarRed else TextSecondary
                     )
-                    Text("Total Load", fontSize = 8.sp, color = TextSecondary)
+                    Text(
+                        text = if (metrics.isLoadOn) "${metrics.loadVoltage}V • ${metrics.loadCurrent}A" else "0V • 0A",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                    Text("Total Load", fontSize = 7.sp, color = TextSecondary)
                 }
             }
 
@@ -1091,7 +1128,7 @@ fun LiveFlowDiagramCard(
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "Input ${metrics.panelPower.toInt()}W",
+                        text = "Input ${metrics.panelPower.toInt()}W • ${metrics.panelCurrent}A",
                         color = SolarGold,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold
@@ -1110,7 +1147,7 @@ fun LiveFlowDiagramCard(
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "Output ${metrics.loadPower.toInt()}W",
+                        text = "Output ${metrics.loadPower.toInt()}W • ${metrics.loadCurrent}A",
                         color = SolarRed,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold

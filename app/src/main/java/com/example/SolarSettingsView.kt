@@ -44,9 +44,11 @@ fun SolarSettingsView(
     var limitVoltage by remember(settings.maxVoltageLimit) { mutableStateOf(settings.maxVoltageLimit) }
     var limitCurrent by remember(settings.maxCurrentLimit) { mutableStateOf(settings.maxCurrentLimit) }
     var limitLowBattery by remember(settings.lowBatteryAlertLimit) { mutableStateOf(settings.lowBatteryAlertLimit) }
+    var limitMaxBatteryChargeCurrent by remember(settings.maxBatteryChargeCurrent) { mutableStateOf(settings.maxBatteryChargeCurrent) }
+    var limitInverterCutOffVoltage by remember(settings.inverterCutOffVoltage) { mutableStateOf(settings.inverterCutOffVoltage) }
 
     // Provisioning states
-    var provisionSsid by remember { mutableStateOf("Mehedy_Home_WiFi") }
+    var provisionSsid by remember { mutableStateOf("IPS_Smart_WiFi") }
     var provisionPass by remember { mutableStateOf("bangladesh2026") }
 
     // DSP/IPS state variables
@@ -195,7 +197,7 @@ fun SolarSettingsView(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Telemetry Route: MQTT Broker -> $editedBroker -> mehedy/solar/$pairedDeviceId",
+                                text = "Telemetry Route: MQTT Broker -> $editedBroker -> smart/solar/$pairedDeviceId",
                                 color = TextSecondary,
                                 fontSize = 10.sp
                             )
@@ -700,43 +702,43 @@ fun SolarSettingsView(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Max Voltage limit
-                Text(
-                    text = "Auto-Cut Over-Voltage Limit: ${String.format("%.1f", limitVoltage)} V",
-                    fontSize = 12.sp,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-                Slider(
-                    value = limitVoltage,
-                    onValueChange = {
-                        limitVoltage = it
-                        viewModel.saveSettings(settings.copy(maxVoltageLimit = it))
-                    },
-                    valueRange = 14.0f..16.0f, // Narrower, realistic single-battery voltage ranges
-                    colors = SliderDefaults.colors(thumbColor = SolarCyan, activeTrackColor = SolarCyan)
-                )
+                // Hardware Programmed Limits Header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(SolarRed.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
+                        .border(1.dp, SolarRed.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                        .padding(10.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "🔒 Device Programmed Protection (হার্ডওয়্যার প্রোগ্রামড সুরক্ষা)",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = SolarRed,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "নিরাপত্তা রক্ষার সুবিধার্থে নিম্নলিখিত থ্রেশহোল্ড ভ্যালুগুলো ডিভাইসে সরাসরি প্রোগ্রাম করা থাকে, যাহা সুরক্ষার স্বার্থে মোবাইল অ্যাপ থেকে পরিবর্তনযোগ্য নয়।",
+                            fontSize = 10.sp,
+                            color = TextSecondary,
+                            lineHeight = 14.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column {
+                                Text("Auto-Cut Over-Voltage", fontSize = 9.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text("${String.format("%.1f", settings.maxVoltageLimit)} V", fontSize = 13.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text("Auto-Cut Over-Current", fontSize = 9.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text("${String.format("%.1f", settings.maxCurrentLimit)} A", fontSize = 13.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Max Current limit
-                Text(
-                    text = "Auto-Cut Over-Current Limit: ${String.format("%.1f", limitCurrent)} A",
-                    fontSize = 12.sp,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-                Slider(
-                    value = limitCurrent,
-                    onValueChange = {
-                        limitCurrent = it
-                        viewModel.saveSettings(settings.copy(maxCurrentLimit = it))
-                    },
-                    valueRange = 2.0f..15.0f, // Better suited for simulated fault triggers
-                    colors = SliderDefaults.colors(thumbColor = SolarGold, activeTrackColor = SolarGold)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Low Battery Alarm
                 Text(
@@ -766,6 +768,92 @@ fun SolarSettingsView(
                         }
                     },
                     label = { Text("Exact Low Voltage Threshold Input (V)", color = TextSecondary) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedBorderColor = SolarRed,
+                        unfocusedBorderColor = SolarBorder
+                    ),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = SolarBorder.copy(alpha = 0.3f), thickness = 1.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Custom Setup Threshold Parameters",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = SolarCyan,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Max Battery Charge Current
+                Text(
+                    text = "Max Battery Charge Current: ${String.format("%.1f", limitMaxBatteryChargeCurrent)} A",
+                    fontSize = 12.sp,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+                Slider(
+                    value = limitMaxBatteryChargeCurrent,
+                    onValueChange = {
+                        limitMaxBatteryChargeCurrent = it
+                        viewModel.saveSettings(settings.copy(maxBatteryChargeCurrent = it))
+                    },
+                    valueRange = 10.0f..80.0f,
+                    colors = SliderDefaults.colors(thumbColor = SolarGold, activeTrackColor = SolarGold)
+                )
+
+                OutlinedTextField(
+                    value = if (limitMaxBatteryChargeCurrent == 0f) "" else String.format("%.1f", limitMaxBatteryChargeCurrent),
+                    onValueChange = { newValue ->
+                        val parsed = newValue.toFloatOrNull()
+                        if (parsed != null && parsed >= 10.0f && parsed <= 80.0f) {
+                            limitMaxBatteryChargeCurrent = parsed
+                            viewModel.saveSettings(settings.copy(maxBatteryChargeCurrent = parsed))
+                        }
+                    },
+                    label = { Text("Exact Max Battery Charge Current (A)", color = TextSecondary) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedBorderColor = SolarGold,
+                        unfocusedBorderColor = SolarBorder
+                    ),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Inverter Cut-off Voltage
+                Text(
+                    text = "Inverter Cut-off Under-Voltage: ${String.format("%.1f", limitInverterCutOffVoltage)} V",
+                    fontSize = 12.sp,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+                Slider(
+                    value = limitInverterCutOffVoltage,
+                    onValueChange = {
+                        limitInverterCutOffVoltage = it
+                        viewModel.saveSettings(settings.copy(inverterCutOffVoltage = it))
+                    },
+                    valueRange = 9.5f..13.0f,
+                    colors = SliderDefaults.colors(thumbColor = SolarRed, activeTrackColor = SolarRed)
+                )
+
+                OutlinedTextField(
+                    value = if (limitInverterCutOffVoltage == 0f) "" else String.format("%.2f", limitInverterCutOffVoltage),
+                    onValueChange = { newValue ->
+                        val parsed = newValue.toFloatOrNull()
+                        if (parsed != null && parsed >= 9.5f && parsed <= 13.0f) {
+                            limitInverterCutOffVoltage = parsed
+                            viewModel.saveSettings(settings.copy(inverterCutOffVoltage = parsed))
+                        }
+                    },
+                    label = { Text("Exact Inverter Cut-off Voltage (V)", color = TextSecondary) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary,

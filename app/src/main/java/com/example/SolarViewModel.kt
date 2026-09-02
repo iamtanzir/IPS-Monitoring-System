@@ -93,7 +93,7 @@ data class GridHistoricalSummary(
 )
 
 data class CustomizerSettings(
-    val customSolarName: String = "Mehedy Hasan's Home Solar",
+    val customSolarName: String = "Universal IPS & Solar System",
     val selectedAccentHex: String = "#00E5FF", // Cyan default
     val isCellVoltagesVisible: Boolean = true,
     val isFlowDiagramVisible: Boolean = true,
@@ -101,11 +101,13 @@ data class CustomizerSettings(
     val maxVoltageLimit: Float = 24.0f,
     val maxCurrentLimit: Float = 20.0f,
     val lowBatteryAlertLimit: Float = 11.5f,
+    val maxBatteryChargeCurrent: Float = 40.0f,
+    val inverterCutOffVoltage: Float = 10.8f,
     
     // MQTT connection simulation
     val mqttBrokerUrl: String = "broker.hivemq.com",
     val mqttPort: Int = 1883,
-    val mqttTopicPrefix: String = "mehedy/solar/solar01",
+    val mqttTopicPrefix: String = "smart/solar/solar01",
     val mqttClientId: String = "solar_monitor_mobile_01",
     val isMqttConnected: Boolean = true,
 
@@ -351,7 +353,7 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadSettings() {
-        val customSolarName = prefs.getString("solar_name", "Mehedy Hasan's Home Solar") ?: "Mehedy Hasan's Home Solar"
+        val customSolarName = prefs.getString("solar_name", "Universal IPS & Solar System") ?: "Universal IPS & Solar System"
         val selectedAccentHex = prefs.getString("accent_hex", "#00E5FF") ?: "#00E5FF"
         val isCellVoltagesVisible = prefs.getBoolean("is_cell_visible", true)
         val isFlowDiagramVisible = prefs.getBoolean("is_flow_visible", true)
@@ -359,10 +361,12 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
         val maxVoltageLimit = prefs.getFloat("max_voltage_limit", 24.0f)
         val maxCurrentLimit = prefs.getFloat("max_current_limit", 20.0f)
         val lowBatteryAlertLimit = prefs.getFloat("low_battery_limit", 11.5f)
+        val maxBatteryChargeCurrent = prefs.getFloat("max_battery_charge_current", 40.0f)
+        val inverterCutOffVoltage = prefs.getFloat("inverter_cut_off_voltage", 10.8f)
         
         val mqttBroker = prefs.getString("mqtt_broker", "broker.hivemq.com") ?: "broker.hivemq.com"
         val mqttPort = prefs.getInt("mqtt_port", 1883)
-        val mqttPrefix = prefs.getString("mqtt_prefix", "mehedy/solar/solar01") ?: "mehedy/solar/solar01"
+        val mqttPrefix = prefs.getString("mqtt_prefix", "smart/solar/solar01") ?: "smart/solar/solar01"
         val mqttClient = prefs.getString("mqtt_client", "solar_monitor_mobile_01") ?: "solar_monitor_mobile_01"
 
         // DSP/IPS custom properties
@@ -383,6 +387,8 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             maxVoltageLimit = maxVoltageLimit,
             maxCurrentLimit = maxCurrentLimit,
             lowBatteryAlertLimit = lowBatteryAlertLimit,
+            maxBatteryChargeCurrent = maxBatteryChargeCurrent,
+            inverterCutOffVoltage = inverterCutOffVoltage,
             mqttBrokerUrl = mqttBroker,
             mqttPort = mqttPort,
             mqttTopicPrefix = mqttPrefix,
@@ -409,6 +415,8 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             putFloat("max_voltage_limit", updated.maxVoltageLimit)
             putFloat("max_current_limit", updated.maxCurrentLimit)
             putFloat("low_battery_limit", updated.lowBatteryAlertLimit)
+            putFloat("max_battery_charge_current", updated.maxBatteryChargeCurrent)
+            putFloat("inverter_cut_off_voltage", updated.inverterCutOffVoltage)
             putString("mqtt_broker", updated.mqttBrokerUrl)
             putInt("mqtt_port", updated.mqttPort)
             putString("mqtt_prefix", updated.mqttTopicPrefix)
