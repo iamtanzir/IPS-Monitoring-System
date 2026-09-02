@@ -47,13 +47,13 @@
         android:fillColor="#495057"
         android:pathData="M65,55 H135 V58 H65 Z M65,63 H120 V65 H65 Z M65,70 H130 V72 H65 Z" />
 
-    <!-- Micro-USB Port -->
+    <!-- Type-C USB Port -->
     <path
         android:fillColor="#DCE1E7"
-        android:pathData="M84,165 H116 A2,2 0 0,1 118,167 V182 A2,2 0 0,1 116,184 H84 A2,2 0 0,1 82,182 V167 A2,2 0 0,1 84,165 Z" />
+        android:pathData="M80,165 H120 A4,4 0 0,1 124,169 V181 A4,4 0 0,1 120,185 H80 A4,4 0 0,1 76,181 V169 A4,4 0 0,1 80,165 Z" />
     <path
-        android:fillColor="#7B8491"
-        android:pathData="M88,171 H112 V177 H88 Z" />
+        android:fillColor="#495057"
+        android:pathData="M84,171 H116 A2,2 0 0,1 118,173 V177 A2,2 0 0,1 116,179 H84 A2,2 0 0,1 82,177 V173 A2,2 0 0,1 84,171 Z" />
 
     <!-- EN and BOOT Buttons -->
     <path android:fillColor="#495057" android:pathData="M48,155 H62 V165 H48 Z" />
@@ -62,7 +62,10 @@
     <path android:fillColor="#495057" android:pathData="M138,155 H152 V165 H138 Z" />
     <path android:fillColor="#DCE1E7" android:pathData="M142,158 H148 V162 H142 Z" />
 
-    <!-- Status LEDs -->
-    <path android:fillColor="#FF3D00" android:pathData="M70,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
-    <path android:fillColor="#00E676" android:pathData="M130,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+    <!-- Addressable WS2812 RGB LED (GPIO 8) and Power LED -->
+    <path android:fillColor="#FF3D00" android:pathData="M65,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+    <!-- WS2812 RGB LED (multi-color badge) -->
+    <path android:fillColor="#334155" android:pathData="M95,138 h10 v10 h-10 z" />
+    <path android:fillColor="#00E5FF" android:pathData="M100,143 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+    <path android:fillColor="#00E676" android:pathData="M135,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
 </vector>

@@ -32,6 +32,10 @@ data class SolarMetrics(
     val isSolarOn: Boolean = true,
     val isChargingOn: Boolean = true,
     val isLoadOn: Boolean = true,
+    val isGridOn: Boolean = true,
+    val gridVoltage: Float = 220.0f,
+    val gridCurrent: Float = 0.55f,
+    val gridPower: Float = 120.0f,
     val panelVoltage: Float = 18.3f,
     val panelCurrent: Float = 1.53f,
     val panelPower: Float = 28f,
@@ -53,7 +57,8 @@ data class SolarMetrics(
     val loadPower: Float = 23f,
     val loadPanelShareW: Float = 15f,
     val loadBatteryShareW: Float = 8f,
-    val loadSource: String = "Panel + Battery", // Panel or Battery
+    val loadGridShareW: Float = 0f,
+    val loadSource: String = "Panel + Battery", // Panel, Battery, Grid, Panel + Battery
     
     // System protection and auto-cut statuses
     val isOverCurrent: Boolean = false,
@@ -152,7 +157,7 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
     private val _isPaired = MutableStateFlow(prefs.getBoolean("is_paired", true)) // Default to true so existing demo works out-of-the-box
     val isPaired: StateFlow<Boolean> = _isPaired.asStateFlow()
 
-    private val _pairedDeviceId = MutableStateFlow(prefs.getString("paired_device_id", "ESP32_HYBRID_IPS_04B") ?: "ESP32_HYBRID_IPS_04B")
+    private val _pairedDeviceId = MutableStateFlow(prefs.getString("paired_device_id", "ESP32_C6_HYBRID_IPS_N16R8") ?: "ESP32_C6_HYBRID_IPS_N16R8")
     val pairedDeviceId: StateFlow<String> = _pairedDeviceId.asStateFlow()
 
     private val _isScanning = MutableStateFlow(false)
@@ -167,9 +172,9 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             _scannedDevices.value = emptyList()
             kotlinx.coroutines.delay(1000)
             _scannedDevices.value = listOf(
-                "ESP32_HYBRID_IPS_04B",
-                "SMART_SOLAR_PLUG_X8",
-                "HYBRID_INVERTER_91G"
+                "ESP32_C6_HYBRID_IPS_N16R8",
+                "ESP32_C6_SOLAR_GATEWAY_02",
+                "SMART_SOLAR_PLUG_X8"
             )
             kotlinx.coroutines.delay(1500)
             _isScanning.value = false
@@ -469,6 +474,12 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
         updateMetrics(current.copy(isLoadOn = newState))
     }
 
+    fun toggleGridPower() {
+        val current = _metrics.value
+        val newState = !current.isGridOn
+        updateMetrics(current.copy(isGridOn = newState))
+    }
+
     // Manual test injection triggers
     fun triggerOverVoltageFault() {
         val current = _metrics.value
@@ -518,38 +529,77 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             0.0f
         }
 
-        // Determine battery state & flow
+        // Determine battery state & flow and source shares
         var batteryCurrent = 0.0f
-        var loadSource = "Panel"
+        var loadSource = "Solar"
         var loadPanelW = 0.0f
         var loadBatteryW = 0.0f
+        var loadGridW = 0.0f
 
-        if (solarPower >= loadPower) {
+        if (newMetrics.isSolarOn && solarPower >= loadPower) {
             // Solar powers the load entirely and charges battery with leftover
-            loadSource = "Panel"
+            loadSource = "Solar"
             loadPanelW = loadPower
             loadBatteryW = 0.0f
+            loadGridW = 0.0f
 
             if (newMetrics.isChargingOn) {
                 val chargePower = solarPower - loadPower
-                // Charge battery (represented as negative discharge / positive charge current)
+                // Charge battery (positive charge current)
                 batteryCurrent = chargePower / newMetrics.batteryVoltage
             }
-        } else {
-            // Solar is not enough. Battery must supplement the remaining load
+        } else if (newMetrics.isSolarOn && solarPower > 0f) {
+            // Solar is generating, but not enough for full load
             loadPanelW = solarPower
-            loadBatteryW = loadPower - solarPower
-            loadSource = if (solarPower > 0) "Panel + Battery" else "Battery"
+            val deficit = loadPower - solarPower
 
-            // Discharge battery (positive discharge current)
-            val dischargePower = loadPower - solarPower
-            batteryCurrent = -dischargePower / newMetrics.batteryVoltage
+            if (newMetrics.batteryVoltage > 11.2f) {
+                loadBatteryW = deficit
+                loadSource = "Solar + Battery"
+                batteryCurrent = -deficit / newMetrics.batteryVoltage
+            } else if (newMetrics.isGridOn) {
+                loadGridW = deficit
+                loadSource = "Solar + Grid Bypass"
+                batteryCurrent = 0.0f
+            } else {
+                loadBatteryW = deficit
+                loadSource = "Solar + Battery (Low)"
+                batteryCurrent = -deficit / newMetrics.batteryVoltage
+            }
+        } else {
+            // Solar is OFF or 0W (night / disabled)
+            loadPanelW = 0.0f
+            if (newMetrics.isGridOn) {
+                loadGridW = loadPower
+                loadBatteryW = 0.0f
+                loadSource = "AC Grid Bypass"
+                if (newMetrics.isChargingOn && newMetrics.batteryPct < 95) {
+                    batteryCurrent = 2.5f
+                } else {
+                    batteryCurrent = 0.0f
+                }
+            } else {
+                loadBatteryW = loadPower
+                loadGridW = 0.0f
+                loadSource = "Battery Inverter"
+                batteryCurrent = if (newMetrics.batteryVoltage > 0) -loadPower / newMetrics.batteryVoltage else 0f
+            }
         }
 
         // Overwrite battery current if manually forced in a test fault
         val finalBatteryCurrent = if (newMetrics.isOverCurrent) newMetrics.batteryCurrent else batteryCurrent
 
         val batteryPower = finalBatteryCurrent * newMetrics.batteryVoltage
+
+        // Calculate AC Grid real-time wattage and ampere
+        val gridBaseStandby = if (newMetrics.isGridOn) 25.0f else 0.0f
+        val gridChargeDrawW = if (newMetrics.isGridOn && batteryCurrent > 0 && !newMetrics.isSolarOn) (batteryCurrent * newMetrics.batteryVoltage * 1.15f) else 0.0f
+        val calculatedGridPower = if (newMetrics.isGridOn) (gridBaseStandby + loadGridW + gridChargeDrawW) else 0.0f
+        val calculatedGridCurrent = if (newMetrics.isGridOn && newMetrics.gridVoltage > 0) {
+            calculatedGridPower / newMetrics.gridVoltage
+        } else {
+            0.0f
+        }
         val batteryStatus = when {
             finalBatteryCurrent > 0.05f -> "Charging"
             finalBatteryCurrent < -0.05f -> "Discharging"
@@ -584,6 +634,9 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             loadPower = ((loadPower * 100).roundToInt() / 100.0f),
             loadPanelShareW = ((loadPanelW * 100).roundToInt() / 100.0f),
             loadBatteryShareW = ((loadBatteryW * 100).roundToInt() / 100.0f),
+            loadGridShareW = ((loadGridW * 100).roundToInt() / 100.0f),
+            gridPower = ((calculatedGridPower * 10).roundToInt() / 10.0f),
+            gridCurrent = ((calculatedGridCurrent * 100).roundToInt() / 100.0f),
             loadSource = loadSource,
             cellVoltages = calculatedCells,
             

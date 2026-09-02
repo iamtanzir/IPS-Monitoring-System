@@ -147,7 +147,7 @@ fun SolarSettingsView(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "ESP32 IoT Inverter Pairing",
+                            text = "ESP32-C6 IoT Inverter Pairing",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
@@ -261,7 +261,7 @@ fun SolarSettingsView(
 
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Step 2: Scan & Select ESP32 Inverter over BLE",
+                        text = "Step 2: Scan & Select ESP32-C6 Inverter over BLE",
                         fontWeight = FontWeight.Bold,
                         color = SolarCyan,
                         fontSize = 11.sp
@@ -961,13 +961,13 @@ fun HelpPairingGuideCard() {
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
                         Text(
-                            text = "ESP32 Pairing & Connection Guide",
+                            text = "ESP32-C6 Pairing & Connection Guide",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
                         )
                         Text(
-                            text = "How to connect your ESP32 Solar System",
+                            text = "How to connect your ESP32-C6 DevKit-C Solar System",
                             style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary,
                             fontSize = 10.sp
@@ -988,26 +988,26 @@ fun HelpPairingGuideCard() {
 
                 GuideStepItem(
                     step = "1",
-                    title = "Enable Bluetooth (BLE)",
-                    desc = "Turn on Bluetooth on your smartphone. The ESP32 broadcasts a BLE signal with the name starting with 'ESP32_HYBRID_IPS_...' when it is ready to pair."
+                    title = "Enable Bluetooth (BLE 5)",
+                    desc = "Turn on Bluetooth on your smartphone. The ESP32-C6 broadcasts a BLE signal with the name starting with 'ESP32_C6_HYBRID_IPS_...' when it is ready to pair."
                 )
 
                 GuideStepItem(
                     step = "2",
-                    title = "Scan & Find Dev",
-                    desc = "Go to 'ESP32 DevKit V1' section in the settings tab below. Click on 'Rescan BLE Gateways'. Locate your serial ID and click on 'PAIR & CONFIG'."
+                    title = "Scan & Select DevKit-C",
+                    desc = "Go to 'ESP32-C6 IoT Inverter Pairing' section in settings below. Click 'Scan for Inverter Bluetooth Gateways'. Locate your serial ID and click 'PAIR & CONFIG'."
                 )
 
                 GuideStepItem(
                     step = "3",
-                    title = "Configure Local Wi-Fi",
-                    desc = "Enter your local home router Wi-Fi SSID and Password. The app securely transfers these credentials via an encrypted Bluetooth handshake."
+                    title = "Configure Local Wi-Fi (Wi-Fi 6 / 2.4GHz)",
+                    desc = "Enter your local router Wi-Fi SSID and Password. The app securely transfers these credentials via an encrypted Bluetooth handshake."
                 )
 
                 GuideStepItem(
                     step = "4",
                     title = "Confirm MQTT Telemetry",
-                    desc = "Once the ESP32 logs into Wi-Fi, it connects to HiveMQ Cloud. The main dashboard connection status will turn to 'MQTT ONLINE' and stream live metrics!"
+                    desc = "Once the ESP32-C6 logs into Wi-Fi, it connects to HiveMQ Cloud. The main dashboard connection status will turn to 'MQTT ONLINE' and stream live metrics!"
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1019,7 +1019,7 @@ fun HelpPairingGuideCard() {
                         .padding(12.dp)
                 ) {
                     Text(
-                        text = "💡 Pro Tip: Ensure your Wi-Fi is 2.4GHz. The ESP32 does not support 5GHz dual-band router bands.",
+                        text = "💡 Pro Tip: ESP32-C6 features Wi-Fi 6 (IEEE 802.11ax) and 2.4GHz 802.11b/g/n with Target Wake Time (TWT), providing better range, less interference, and ultra-reliable cloud sync.",
                         fontSize = 11.sp,
                         color = SolarCyan,
                         fontWeight = FontWeight.Medium

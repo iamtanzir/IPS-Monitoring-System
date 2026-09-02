@@ -300,6 +300,17 @@ fun SolarHomeView(
             }
         }
 
+        // Real-Time Energy Flow & Current (A / W) Matrix Component
+        item {
+            RealtimeEnergyFlowCard(
+                metrics = metrics,
+                accentColor = accentColor,
+                onToggleSolar = { viewModel.toggleSolarPower() },
+                onToggleBattery = { viewModel.toggleBatteryCharging() },
+                onToggleGrid = { viewModel.toggleGridPower() }
+            )
+        }
+
         // Customer Unit Binding & Manufacturer Support Card for DSP/IPS Global Monitoring
         item {
             Card(
@@ -483,7 +494,7 @@ fun SolarHomeView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ControlButton(
-                        title = "Solar Power Input",
+                        title = "Solar Input",
                         subtitle = "PV DC Input",
                         watts = if (metrics.isSolarOn) "${metrics.panelPower.toInt()} W" else "0 W",
                         isOn = metrics.isSolarOn,
@@ -493,18 +504,28 @@ fun SolarHomeView(
                         testTag = "solar_power_toggle"
                     )
                     ControlButton(
+                        title = "AC Grid",
+                        subtitle = "Utility Line",
+                        watts = if (metrics.isGridOn) "${metrics.gridPower.toInt()} W" else "0 W",
+                        isOn = metrics.isGridOn,
+                        icon = if (metrics.isGridOn) Icons.Default.Power else Icons.Default.PowerOff,
+                        activeColor = SolarGreen,
+                        onClick = { viewModel.toggleGridPower() },
+                        testTag = "grid_power_toggle"
+                    )
+                    ControlButton(
                         title = "Battery Charger",
                         subtitle = "BMS Bypass",
-                        watts = if (metrics.isChargingOn && metrics.isSolarOn) "${Math.abs(metrics.batteryPower).toInt()} W" else "0 W",
+                        watts = if (metrics.isChargingOn && (metrics.isSolarOn || metrics.isGridOn)) "${Math.abs(metrics.batteryPower).toInt()} W" else "0 W",
                         isOn = metrics.isChargingOn,
                         icon = Icons.Default.BatteryChargingFull,
-                        activeColor = SolarGreen,
+                        activeColor = SolarCyan,
                         onClick = { viewModel.toggleBatteryCharging() },
                         testTag = "battery_charging_toggle"
                     )
                     ControlButton(
-                        title = "AC Inverter Load",
-                        subtitle = "Output AC Relay",
+                        title = "AC Load",
+                        subtitle = "Output Relay",
                         watts = if (metrics.isLoadOn && !metrics.isAutoCutTripped) "${metrics.loadPower.toInt()} W" else "0 W",
                         isOn = metrics.isLoadOn && !metrics.isAutoCutTripped,
                         icon = Icons.Default.FlashOn,
@@ -562,7 +583,7 @@ fun SolarHomeView(
                             Icon(Icons.Default.Dns, contentDescription = "Diagnostics", tint = SolarCyan, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "ESP32 Hardware Diagnostics",
+                                text = "ESP32-C6 Hardware Diagnostics",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Bold
@@ -575,14 +596,21 @@ fun SolarHomeView(
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "v1.4.2-stable",
+                                text = "ESP32-C6 N16R8",
                                 color = SolarCyan,
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "RISC-V 160MHz • 16MB Flash (N16) • 8MB PSRAM (R8) • Wi-Fi 6 • BLE 5.0",
+                        fontSize = 9.sp,
+                        color = SolarGold,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
                     Divider(color = SolarBorder.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -595,7 +623,7 @@ fun SolarHomeView(
                             Text(lastSyncTime, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = SolarGreen)
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("WIFI SIGNAL STRENGTH", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Text("WIFI 6 (802.11ax) SIGNAL", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
                             Text("-58 dBm (Excellent)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         }
                     }
@@ -627,7 +655,7 @@ fun SolarHomeView(
                         Icon(Icons.Default.Memory, contentDescription = null, tint = SolarCyan, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Hardware Component BOM & Circuit Diagram (ছবিসহ)",
+                            text = "ESP32-C6 Component BOM & Circuit Diagram (ছবিসহ)",
                             color = SolarCyan,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold
@@ -919,10 +947,10 @@ fun LiveFlowDiagramCard(
             }
 
             // 2. GRID / BYPASS NODE (Top Right)
-            val isGridActive = true
-            val gridVoltage = 220f
-            val gridPower = if (metrics.isLoadOn) (metrics.loadPower + 120f) else 120f
-            val gridCurrent = gridPower / gridVoltage
+            val isGridActive = metrics.isGridOn && metrics.gridPower > 0
+            val gridVoltage = metrics.gridVoltage
+            val gridPower = metrics.gridPower
+            val gridCurrent = metrics.gridCurrent
 
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -940,7 +968,12 @@ fun LiveFlowDiagramCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Power, contentDescription = null, tint = SolarGreen, modifier = Modifier.size(16.dp))
+                        Icon(
+                            imageVector = if (metrics.isGridOn) Icons.Default.Power else Icons.Default.PowerOff,
+                            contentDescription = null,
+                            tint = if (metrics.isGridOn) SolarGreen else Color.Gray,
+                            modifier = Modifier.size(16.dp)
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("AC GRID", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
                     }
@@ -949,15 +982,20 @@ fun LiveFlowDiagramCard(
                         text = "${gridPower.toInt()} W",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = SolarGreen
+                        color = if (metrics.isGridOn) SolarGreen else Color.Gray
                     )
                     Text(
-                        text = "220V • ${String.format("%.2f", gridCurrent)}A",
+                        text = if (metrics.isGridOn) "${gridVoltage.toInt()}V • ${String.format("%.2f", gridCurrent)}A" else "0V • 0.00A",
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextSecondary
                     )
-                    Text("Grid Online", fontSize = 8.sp, color = SolarGreen, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = if (metrics.isGridOn) "Grid Online" else "Grid Outage",
+                        fontSize = 8.sp,
+                        color = if (metrics.isGridOn) SolarGreen else SolarRed,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
 

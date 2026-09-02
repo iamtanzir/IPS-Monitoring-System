@@ -38,7 +38,9 @@ data class BomItem(
     val esp32PinConnection: String,
     val voltageRating: String,
     val descriptionBn: String,
-    val whyNeededBn: String
+    val whyNeededBn: String,
+    val buyUrl: String = "",
+    val storeName: String = ""
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,17 +130,19 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
         listOf(
             BomItem(
                 id = "esp32",
-                nameEn = "ESP32 DevKit V1 Microcontroller",
-                nameBn = "ESP32 মাইক্রোকন্ট্রোলার বোর্ড",
-                partNumber = "ESP-WROOM-32 (30-Pin / 38-Pin)",
+                nameEn = "ESP32-C6 DevKit-C N16R8 Development Board",
+                nameBn = "ESP32-C6 N16R8 ডেভেলপমেন্ট বোর্ড (WiFi 6 + BLE 5 + Zigbee)",
+                partNumber = "ESP32-C6-WROOM-1-N16R8 (16MB Flash / 8MB PSRAM)",
                 category = "Controller",
                 imageRes = R.drawable.ic_bom_esp32,
                 quantity = 1,
-                unitPriceBdt = 480,
-                esp32PinConnection = "Master Controller (WiFi & BLE Core)",
-                voltageRating = "5V Input (VIN) / 3.3V Logic",
-                descriptionBn = "সিস্টেমের ব্রেইন। সেন্সরের এনালগ ও ডিজিটাল ডেটা পড়ে ওয়াইফাই এর মাধ্যমে ক্লাউড ও মোবাইল অ্যাপে পাঠায়।",
-                whyNeededBn = "২৪০ মেগাহার্টজ ডুয়াল কোর প্রসেসর এবং বিল্ট-ইন ওয়াইফাই মডিউল সমৃদ্ধ।"
+                unitPriceBdt = 890,
+                esp32PinConnection = "Master Controller (RISC-V 160MHz • Wi-Fi 6 • BLE 5.0 • Type-C)",
+                voltageRating = "5V Input (USB-C / VIN) • 3.3V Logic Level",
+                descriptionBn = "সিস্টেমের মূল প্রসেসর। এতে রয়েছে দ্রুতগতির ১৬০MHz RISC-V কোর, ১৬MB ফ্ল্যাশ মেমোরি, ৮MB PSRAM এবং আধুনিক ওয়াইফাই ৬ (802.11ax), ব্লুটুথ ৫ ও জিগবি/ম্যাটার সাপোর্ট।",
+                whyNeededBn = "বিডিট্রনিক্স (BDtronics) অনুমোদিত অফিসিয়াল বোর্ড। ইউএসবি টাইপ-সি ইন্টারফেস ও বিশাল মেমোরির ফলে ক্লাউড আইওটি ও ফাস্ট ব্লুটুথ পেয়ারিং সবচেয়ে নির্ভরযোগ্য।",
+                buyUrl = "https://www.bdtronics.com/esp32-c6-devkit-c-n16r8-esp32-development-board-wifi-bluetooth.html",
+                storeName = "BDtronics Bangladesh"
             ),
             BomItem(
                 id = "acs712",
@@ -149,10 +153,10 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_acs712,
                 quantity = 1,
                 unitPriceBdt = 180,
-                esp32PinConnection = "OUT -> 1k/2k Divider -> GPIO D34 (ADC1)",
+                esp32PinConnection = "OUT -> 1k/2k Divider -> ESP32-C6 GPIO 1 (ADC1_CH1)",
                 voltageRating = "5V VCC, 0-20A/30A Hall Effect",
                 descriptionBn = "সোলার ও লোডের মধ্য দিয়ে প্রবাহিত রিয়েল-টাইম কারেন্ট (অ্যাম্পিয়ার) নির্ভুলভাবে পরিমাপ করে।",
-                whyNeededBn = "৫ ভোল্ট আউটপুটকে ESP32 এর ৩.৩ ভোল্ট সেইফ লেভেলে নামাতে ১কে ও ২কে রেজিস্টর ডিভায়ডার প্রয়োজন।"
+                whyNeededBn = "৫ ভোল্ট সেন্সর সিগন্যালকে ESP32-C6 এর নিরাপদ ৩.৩V এডিসি ইনপুটে সীমাবদ্ধ রাখতে ১k ও ২k রেজিস্টর ব্যবহার করা হয়েছে।"
             ),
             BomItem(
                 id = "voltage_sensor",
@@ -163,7 +167,7 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_voltage_sensor,
                 quantity = 1,
                 unitPriceBdt = 90,
-                esp32PinConnection = "Signal (S) -> GPIO D27 (ADC2)",
+                esp32PinConnection = "Signal (S) -> ESP32-C6 GPIO 2 (ADC1_CH2)",
                 voltageRating = "Input: 0 - 25V DC",
                 descriptionBn = "সোলার প্যানেল এবং ব্যাটারির টার্মিনাল ভোল্টেজ নিখুঁতভাবে সেন্স করার জন্য ৫:১ অনুপাতের ভোল্টেজ ডিভায়ডার।",
                 whyNeededBn = "ব্যাটারি ফুল চার্জ নাকি লো ভোল্টেজ তা জানার জন্য এটি অপরিহার্য।"
@@ -177,7 +181,7 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_ds18b20,
                 quantity = 1,
                 unitPriceBdt = 160,
-                esp32PinConnection = "Data Wire -> GPIO D4 (with 4.7kΩ Pull-up to 3.3V)",
+                esp32PinConnection = "Data Wire -> ESP32-C6 GPIO 18 (with 4.7kΩ Pull-up to 3.3V)",
                 voltageRating = "3.0V - 5.5V DC",
                 descriptionBn = "ব্যাটারি ও ইনভার্টার হিটসিংকের তাপমাত্রা রিয়েল-টাইম পর্যবেক্ষণ করে ওভার-হিটিং প্রটেকশন দেয়।",
                 whyNeededBn = "স্টেইনলেস স্টিলের ওয়াটারপ্রুফ প্রোব সরাসরি ব্যাটারি সেলে লাগিয়ে রাখা যায়।"
@@ -191,10 +195,10 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_lcd_i2c,
                 quantity = 1,
                 unitPriceBdt = 320,
-                esp32PinConnection = "SDA -> GPIO D21, SCL -> GPIO D22, VCC -> 5V",
+                esp32PinConnection = "SDA -> ESP32-C6 GPIO 6, SCL -> ESP32-C6 GPIO 7, VCC -> 5V",
                 voltageRating = "5V DC Operating",
                 descriptionBn = "মোবাইল ফোন ছাড়াও সরাসরি ডিভাইসের সামনে দাঁড়িয়ে সোলার ভোল্টেজ, কারেন্ট ও পাওয়ার দেখার স্ক্রিন।",
-                whyNeededBn = "I2C অ্যাডাপ্টার থাকায় মাত্র ২টি তারের (SDA, SCL) মাধ্যমে সংযোগ সম্পন্ন হয়।"
+                whyNeededBn = "I2C বাস ব্যবহারের ফলে মাত্র ২টি তারের (GPIO 6, 7) মাধ্যমে সব ডেটা প্রদর্শিত হয়।"
             ),
             BomItem(
                 id = "bh1750",
@@ -205,7 +209,7 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_bh1750,
                 quantity = 1,
                 unitPriceBdt = 150,
-                esp32PinConnection = "SDA -> GPIO D21, SCL -> GPIO D22, VCC -> 3.3V/5V",
+                esp32PinConnection = "SDA -> ESP32-C6 GPIO 6, SCL -> ESP32-C6 GPIO 7, VCC -> 3.3V/5V",
                 voltageRating = "3.3V - 5V DC",
                 descriptionBn = "সূর্যের তীব্রতা (Solar Irradiance in Lux) পরিমাপ করে সিস্টেম এফিসিয়েন্সি গণনা করে।",
                 whyNeededBn = "মেঘলা আকাশ নাকি সরাসরি কড়া রোদ তা অটোমেটিক ডিটেক্ট করে।"
@@ -219,10 +223,10 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_buck_converter,
                 quantity = 1,
                 unitPriceBdt = 130,
-                esp32PinConnection = "OUT+ -> ESP32 VIN & 5V Rail, OUT- -> ESP32 GND",
+                esp32PinConnection = "OUT+ -> ESP32-C6 VIN & 5V Rail, OUT- -> ESP32-C6 GND",
                 voltageRating = "Input: 7-35V DC, Output: 5.0V Regulated",
-                descriptionBn = "১২V ব্যাটারি বা সোলার প্যানেল থেকে স্টেবল ৫ ভোল্ট তৈরি করে ESP32 ও সেন্সরকে পাওয়ার সাপ্লাই দেয়।",
-                whyNeededBn = "হাই ভোল্টেজ স্পাইক থেকে ESP32 ও সার্কিট রক্ষা করতে ৯২% হাই এফিশিয়েন্ট বাক রেগুলেটর।"
+                descriptionBn = "১২V ব্যাটারি বা সোলার প্যানেল থেকে স্টেবল ৫ ভোল্ট তৈরি করে ESP32-C6 ও সেন্সরকে পাওয়ার সাপ্লাই দেয়।",
+                whyNeededBn = "হাই ভোল্টেজ স্পাইক থেকে ESP32-C6 ও সার্কিট রক্ষা করতে ৯২% হাই এফিশিয়েন্ট বাক রেগুলেটর।"
             ),
             BomItem(
                 id = "solar_panel",
@@ -247,10 +251,10 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                 imageRes = R.drawable.ic_bom_resistors_wires,
                 quantity = 1,
                 unitPriceBdt = 90,
-                esp32PinConnection = "Voltage Divider for ACS712 (D34) & Pullup for DS18B20 (D4)",
+                esp32PinConnection = "Voltage Divider for ACS712 (GPIO 1) & Pullup for DS18B20 (GPIO 18)",
                 voltageRating = "1/4 Watt Metal Film Resistors",
-                descriptionBn = "ACS712 এর ৫V সিগন্যালকে ESP32 ৩.৩V এডিসি সেফটিতে ডিভাইড করতে ১কে ও ২কে রেজিস্টর এবং DS18B20 এর জন্য ৪.৭কে পুল-আপ।",
-                whyNeededBn = "ESP32 পিন সুরক্ষা ও নির্ভরযোগ্য ওয়ান-ওয়্যার ডেটা কমিউনিকেশন নিশ্চিত করে।"
+                descriptionBn = "ACS712 এর ৫V সিগন্যালকে ESP32-C6 ৩.৩V এডিসি সেফটিতে ডিভাইড করতে ১কে ও ২কে রেজিস্টর এবং DS18B20 এর জন্য ৪.৭কে পুল-আপ।",
+                whyNeededBn = "ESP32-C6 পিন সুরক্ষা ও নির্ভরযোগ্য ওয়ান-ওয়্যার ডেটা কমিউনিকেশন নিশ্চিত করে।"
             )
         )
     }
@@ -329,7 +333,7 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = "সার্কিট ডায়াগ্রাম অনুযায়ী সংযোগ গাইড (Pinout Quick Guide):",
+                        text = "সার্কিট ডায়াগ্রাম অনুযায়ী সংযোগ গাইড (ESP32-C6 Pinout Quick Guide):",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = SolarCyan
@@ -344,11 +348,12 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                             .background(Color.White.copy(alpha = 0.04f), RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     ) {
-                        PinoutRow(pin = "D34 (ADC1)", wireColor = "#EC4899", desc = "ACS712 কারেন্ট সেন্সর (১k/২k ভোল্টেজ ডিভায়ডার সহ)")
-                        PinoutRow(pin = "D27 (ADC2)", wireColor = "#3B82F6", desc = "ভোল্টেজ সেন্সর সিগন্যাল (০-২৫V)")
-                        PinoutRow(pin = "D4 (1-Wire)", wireColor = "#A855F7", desc = "DS18B20 তাপমাত্রা সেন্সর (৪.৭k পুল-আপ সহ)")
-                        PinoutRow(pin = "D21 (SDA)", wireColor = "#22C55E", desc = "I2C ডেটা লাইন (LCD1602 এবং BH1750 লাইট সেন্সর)")
-                        PinoutRow(pin = "D22 (SCL)", wireColor = "#2563EB", desc = "I2C ক্লক লাইন (LCD1602 এবং BH1750 লাইট সেন্সর)")
+                        PinoutRow(pin = "GPIO 1 (ADC1)", wireColor = "#EC4899", desc = "ACS712 কারেন্ট সেন্সর (১k/২k ভোল্টেজ ডিভায়ডার সহ)")
+                        PinoutRow(pin = "GPIO 2 (ADC1)", wireColor = "#3B82F6", desc = "ভোল্টেজ সেন্সর সিগন্যাল (০-২৫V)")
+                        PinoutRow(pin = "GPIO 18 (1-Wire)", wireColor = "#A855F7", desc = "DS18B20 তাপমাত্রা সেন্সর (৪.৭k পুল-আপ সহ)")
+                        PinoutRow(pin = "GPIO 6 (SDA)", wireColor = "#22C55E", desc = "I2C ডেটা লাইন (LCD1602 এবং BH1750 লাইট সেন্সর)")
+                        PinoutRow(pin = "GPIO 7 (SCL)", wireColor = "#2563EB", desc = "I2C ক্লক লাইন (LCD1602 এবং BH1750 লাইট সেন্সর)")
+                        PinoutRow(pin = "GPIO 8 (WS2812)", wireColor = "#F59E0B", desc = "অনবোর্ড অ্যাড্রেসেবল RGB স্ট্যাটাস এলইডি")
                         PinoutRow(pin = "VIN & GND", wireColor = "#EF4444", desc = "৫V DC পাওয়ার সাপ্লাই (LM2596 বাক কনভার্টার)")
                     }
                 }
@@ -446,7 +451,7 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• ১k ও ২k ভোল্টেজ ডিভায়ডার: ACS712 এর অ্যানালগ আউটপুট সর্বোচ্চ ৫ ভোল্ট পর্যন্ত যেতে পারে, কিন্তু ESP32 এর অ্যানালগ পিন (D34) সর্বোচ্চ ৩.৩ ভোল্ট সহ্য করতে পারে। তাই রেজিস্টর ডিভায়ডার মিস করলে ESP32 নষ্ট হয়ে যেতে পারে!\n• কমন গ্রাউন্ড (Common GND): পাওয়ার সাপ্লাই, সোলার সেন্সর এবং ESP32 এর GND পিন অবশ্যই একসাথে কমন সংযোগ দিতে হবে।\n• ৪.৭k পুল-আপ রেজিস্টর: DS18B20 সেন্সরের ডেটা তারের (হলুদ) সাথে ৩.৩V লাইনে ৪.৭k রেজিস্টর যুক্ত করতে ভুলবেন না।",
+                        text = "• ১k ও ২k ভোল্টেজ ডিভায়ডার: ACS712 এর অ্যানালগ আউটপুট সর্বোচ্চ ৫ ভোল্ট পর্যন্ত যেতে পারে, কিন্তু ESP32-C6 এর অ্যানালগ পিন (GPIO 1) সর্বোচ্চ ৩.৩ ভোল্ট সহ্য করতে পারে। তাই রেজিস্টর ডিভায়ডার মিস করলে ESP32-C6 এর এডিসি চ্যানেল ক্ষতিগ্রস্ত হতে পারে!\n• কমন গ্রাউন্ড (Common GND): পাওয়ার সাপ্লাই, সোলার সেন্সর এবং ESP32-C6 এর GND পিন অবশ্যই একসাথে কমন গ্রাউন্ড সংযোগ দিতে হবে।\n• ৪.৭k পুল-আপ রেজিস্টর: DS18B20 সেন্সরের ডেটা তারের (হলুদ) সাথে ৩.৩V লাইনে ৪.৭k রেজিস্টর যুক্ত করতে ভুলবেন না।\n• টাইপ-সি ইউএসবি ও মেমোরি: ESP32-C6 DevKit-C বোর্ডে আধুনিক Type-C পোর্ট, ১৬MB Flash ও ৮MB PSRAM রয়েছে, যা ফার্মওয়্যার ও ক্লাউড ডেটা প্রসেসিং দ্রুততর করে।",
                         fontSize = 10.sp,
                         color = TextSecondary,
                         lineHeight = 15.sp
@@ -603,7 +608,7 @@ fun BomItemCard(item: BomItem) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Cable, contentDescription = null, tint = SolarCyan, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("ESP32 কানেকশন পিন:", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = SolarCyan)
+                                Text("ESP32-C6 কানেকশন পিন:", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = SolarCyan)
                             }
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(item.esp32PinConnection, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
@@ -619,6 +624,41 @@ fun BomItemCard(item: BomItem) {
                         color = SolarGreen,
                         lineHeight = 14.sp
                     )
+
+                    if (item.buyUrl.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        Button(
+                            onClick = {
+                                try {
+                                    val intent = android.content.Intent(
+                                        android.content.Intent.ACTION_VIEW,
+                                        android.net.Uri.parse(item.buyUrl)
+                                    )
+                                    context.startActivity(intent)
+                                } catch (_: Exception) {}
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = SolarGold),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(38.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.ShoppingCart,
+                                contentDescription = null,
+                                tint = Color.Black,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "BDtronics থেকে অর্ডার করুন (৳${item.unitPriceBdt})",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black
+                            )
+                        }
+                    }
                 }
             }
         }
