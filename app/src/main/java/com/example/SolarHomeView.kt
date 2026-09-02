@@ -143,7 +143,7 @@ fun SolarHomeView(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "eCandle Solar Monitoring",
+                                        text = "Universal IPS, Inverter & Solar Monitoring",
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = TextSecondary,
@@ -248,6 +248,8 @@ fun SolarHomeView(
                             }
                         }
 
+                        Spacer(modifier = Modifier.height(14.dp))
+                        LivePowerBalanceDialGauge(metrics = metrics)
                         Spacer(modifier = Modifier.height(14.dp))
 
                         // MQTT and Connection Pulse Status Bar
@@ -700,28 +702,33 @@ fun LiveFlowDiagramCard(
                 )
 
                 if (metrics.isSolarOn) {
-                    // Interpolated glowing dot on solar flow path
-                    val d1 = (centralInverterX - 35.dp.toPx()) - (pvX + nodeWidth / 2f)
-                    val d2 = (centralInverterY - 20.dp.toPx()) - pvY
-                    val d3 = 35.dp.toPx()
-                    val totalD = d1 + d2 + d3
-                    val currentPos = totalD * (flowOffset / 100f)
+                    for (i in 0 until 3) {
+                        val phaseOffset = i * 33.3f
+                        val currentFlow = (flowOffset + phaseOffset) % 100f
 
-                    val dotX: Float
-                    val dotY: Float
-                    if (currentPos < d1) {
-                        dotX = (pvX + nodeWidth / 2f) + currentPos
-                        dotY = pvY
-                    } else if (currentPos < d1 + d2) {
-                        dotX = centralInverterX - 35.dp.toPx()
-                        dotY = pvY + (currentPos - d1)
-                    } else {
-                        dotX = (centralInverterX - 35.dp.toPx()) + (currentPos - d1 - d2)
-                        dotY = centralInverterY - 20.dp.toPx()
+                        val d1 = (centralInverterX - 35.dp.toPx()) - (pvX + nodeWidth / 2f)
+                        val d2 = (centralInverterY - 20.dp.toPx()) - pvY
+                        val d3 = 35.dp.toPx()
+                        val totalD = d1 + d2 + d3
+                        val currentPos = totalD * (currentFlow / 100f)
+
+                        val dotX: Float
+                        val dotY: Float
+                        if (currentPos < d1) {
+                            dotX = (pvX + nodeWidth / 2f) + currentPos
+                            dotY = pvY
+                        } else if (currentPos < d1 + d2) {
+                            dotX = centralInverterX - 35.dp.toPx()
+                            dotY = pvY + (currentPos - d1)
+                        } else {
+                            dotX = (centralInverterX - 35.dp.toPx()) + (currentPos - d1 - d2)
+                            dotY = centralInverterY - 20.dp.toPx()
+                        }
+
+                        val trailingAlpha = 1.0f - (i * 0.3f)
+                        drawCircle(color = SolarGold.copy(alpha = trailingAlpha), radius = activeGlow, center = Offset(dotX, dotY))
+                        drawCircle(color = SolarGold.copy(alpha = trailingAlpha * 0.4f), radius = activeGlow * 2.0f, center = Offset(dotX, dotY))
                     }
-
-                    drawCircle(color = SolarGold, radius = activeGlow, center = Offset(dotX, dotY))
-                    drawCircle(color = SolarGold.copy(alpha = 0.4f), radius = activeGlow * 1.8f, center = Offset(dotX, dotY))
                 }
 
                 // 2. Battery (Bottom Left) <-> Inverter (Center)
@@ -747,29 +754,35 @@ fun LiveFlowDiagramCard(
                 )
 
                 if (hasBatteryCurrent) {
-                    val d1 = (centralInverterX - 35.dp.toPx()) - (batteryX + nodeWidth / 2f)
-                    val d2 = batteryY - (centralInverterY + 20.dp.toPx())
-                    val d3 = 35.dp.toPx()
-                    val totalD = d1 + d2 + d3
+                    for (i in 0 until 3) {
+                        val phaseOffset = i * 33.3f
+                        val currentFlow = (flowOffset + phaseOffset) % 100f
 
-                    val progress = if (isCharging) (flowOffset / 100f) else (1f - (flowOffset / 100f))
-                    val currentPos = totalD * progress
+                        val d1 = (centralInverterX - 35.dp.toPx()) - (batteryX + nodeWidth / 2f)
+                        val d2 = batteryY - (centralInverterY + 20.dp.toPx())
+                        val d3 = 35.dp.toPx()
+                        val totalD = d1 + d2 + d3
 
-                    val dotX: Float
-                    val dotY: Float
-                    if (currentPos < d1) {
-                        dotX = (batteryX + nodeWidth / 2f) + currentPos
-                        dotY = batteryY
-                    } else if (currentPos < d1 + d2) {
-                        dotX = centralInverterX - 35.dp.toPx()
-                        dotY = batteryY - (currentPos - d1)
-                    } else {
-                        dotX = (centralInverterX - 35.dp.toPx()) + (currentPos - d1 - d2)
-                        dotY = centralInverterY + 20.dp.toPx()
+                        val progress = if (isCharging) (currentFlow / 100f) else (1f - (currentFlow / 100f))
+                        val currentPos = totalD * progress
+
+                        val dotX: Float
+                        val dotY: Float
+                        if (currentPos < d1) {
+                            dotX = (batteryX + nodeWidth / 2f) + currentPos
+                            dotY = batteryY
+                        } else if (currentPos < d1 + d2) {
+                            dotX = centralInverterX - 35.dp.toPx()
+                            dotY = batteryY - (currentPos - d1)
+                        } else {
+                            dotX = (centralInverterX - 35.dp.toPx()) + (currentPos - d1 - d2)
+                            dotY = centralInverterY + 20.dp.toPx()
+                        }
+
+                        val trailingAlpha = 1.0f - (i * 0.3f)
+                        drawCircle(color = SolarGreen.copy(alpha = trailingAlpha), radius = activeGlow, center = Offset(dotX, dotY))
+                        drawCircle(color = SolarGreen.copy(alpha = trailingAlpha * 0.4f), radius = activeGlow * 2.0f, center = Offset(dotX, dotY))
                     }
-
-                    drawCircle(color = SolarGreen, radius = activeGlow, center = Offset(dotX, dotY))
-                    drawCircle(color = SolarGreen.copy(alpha = 0.4f), radius = activeGlow * 1.8f, center = Offset(dotX, dotY))
                 }
 
                 // 3. Grid / Bypass (Top Right) -> Inverter (Center)
@@ -807,27 +820,33 @@ fun LiveFlowDiagramCard(
                 )
 
                 if (metrics.isLoadOn) {
-                    val d1 = 35.dp.toPx()
-                    val d2 = loadY - (centralInverterY + 20.dp.toPx())
-                    val d3 = (loadX - nodeWidth / 2f) - (centralInverterX + 35.dp.toPx())
-                    val totalD = d1 + d2 + d3
-                    val currentPos = totalD * (flowOffset / 100f)
+                    for (i in 0 until 3) {
+                        val phaseOffset = i * 33.3f
+                        val currentFlow = (flowOffset + phaseOffset) % 100f
 
-                    val dotX: Float
-                    val dotY: Float
-                    if (currentPos < d1) {
-                        dotX = centralInverterX + currentPos
-                        dotY = centralInverterY + 20.dp.toPx()
-                    } else if (currentPos < d1 + d2) {
-                        dotX = centralInverterX + 35.dp.toPx()
-                        dotY = (centralInverterY + 20.dp.toPx()) + (currentPos - d1)
-                    } else {
-                        dotX = (centralInverterX + 35.dp.toPx()) + (currentPos - d1 - d2)
-                        dotY = loadY
+                        val d1 = 35.dp.toPx()
+                        val d2 = loadY - (centralInverterY + 20.dp.toPx())
+                        val d3 = (loadX - nodeWidth / 2f) - (centralInverterX + 35.dp.toPx())
+                        val totalD = d1 + d2 + d3
+                        val currentPos = totalD * (currentFlow / 100f)
+
+                        val dotX: Float
+                        val dotY: Float
+                        if (currentPos < d1) {
+                            dotX = centralInverterX + currentPos
+                            dotY = centralInverterY + 20.dp.toPx()
+                        } else if (currentPos < d1 + d2) {
+                            dotX = centralInverterX + 35.dp.toPx()
+                            dotY = (centralInverterY + 20.dp.toPx()) + (currentPos - d1)
+                        } else {
+                            dotX = (centralInverterX + 35.dp.toPx()) + (currentPos - d1 - d2)
+                            dotY = loadY
+                        }
+
+                        val trailingAlpha = 1.0f - (i * 0.3f)
+                        drawCircle(color = SolarRed.copy(alpha = trailingAlpha), radius = activeGlow, center = Offset(dotX, dotY))
+                        drawCircle(color = SolarRed.copy(alpha = trailingAlpha * 0.4f), radius = activeGlow * 2.0f, center = Offset(dotX, dotY))
                     }
-
-                    drawCircle(color = SolarRed, radius = activeGlow, center = Offset(dotX, dotY))
-                    drawCircle(color = SolarRed.copy(alpha = 0.4f), radius = activeGlow * 1.8f, center = Offset(dotX, dotY))
                 }
             }
 
@@ -1663,6 +1682,156 @@ fun ProtectionIndicatorItem(
                         shape = CircleShape
                     )
             )
+        }
+    }
+}
+
+@Composable
+fun LivePowerBalanceDialGauge(
+    metrics: SolarMetrics,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "gauge_glow")
+    val pulseGlow by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse_glow"
+    )
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.03f)),
+        border = BorderStroke(1.dp, SolarBorder.copy(alpha = 0.5f)),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(180.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            // Left: The Custom Circular Gauge Canvas
+            Box(
+                modifier = Modifier
+                    .size(130.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val strokeWidthValue = 10.dp.toPx()
+                    val centerOffset = Offset(size.width / 2, size.height / 2)
+                    val radius = (size.width - strokeWidthValue) / 2f
+
+                    // 1. Draw background neutral tracks
+                    drawCircle(
+                        color = Color.Gray.copy(alpha = 0.1f),
+                        radius = radius,
+                        center = centerOffset,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidthValue)
+                    )
+
+                    // 2. Solar Generation Arc (Solar power out of 805W maximum)
+                    val pvRatio = (metrics.panelPower / 805f).coerceIn(0f, 1f)
+                    val pvSweepAngle = pvRatio * 180f
+                    drawArc(
+                        color = SolarGold,
+                        startAngle = 180f,
+                        sweepAngle = pvSweepAngle,
+                        useCenter = false,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = strokeWidthValue,
+                            cap = androidx.compose.ui.graphics.StrokeCap.Round
+                        ),
+                        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
+                        topLeft = Offset(strokeWidthValue / 2, strokeWidthValue / 2)
+                    )
+
+                    // 3. Load Consumption Arc (Load power out of 1500W maximum)
+                    val loadRatio = (metrics.loadPower / 1500f).coerceIn(0f, 1f)
+                    val loadSweepAngle = loadRatio * 180f
+                    drawArc(
+                        color = SolarRed,
+                        startAngle = 360f,
+                        sweepAngle = -loadSweepAngle,
+                        useCenter = false,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = strokeWidthValue,
+                            cap = androidx.compose.ui.graphics.StrokeCap.Round
+                        ),
+                        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
+                        topLeft = Offset(strokeWidthValue / 2, strokeWidthValue / 2)
+                    )
+                }
+
+                // Center Digital Readout
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    val netPower = metrics.panelPower - metrics.loadPower
+                    val isSurplus = netPower >= 0
+                    Text(
+                        text = if (isSurplus) "SURPLUS" else "DEFICIT",
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isSurplus) SolarGreen else SolarRed,
+                        letterSpacing = 1.sp
+                    )
+                    Text(
+                        text = "${if (isSurplus) "+" else ""}${netPower.toInt()} W",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = TextPrimary
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(
+                                color = (if (isSurplus) SolarGreen else SolarRed).copy(alpha = pulseGlow),
+                                shape = CircleShape
+                            )
+                    )
+                }
+            }
+
+            // Right: Legend and detailed readouts
+            Column(
+                modifier = Modifier.padding(start = 8.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(8.dp).background(SolarGold, CircleShape))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Column {
+                        Text("Solar Input", fontSize = 8.sp, color = TextSecondary)
+                        Text("${metrics.panelPower.toInt()} W / 805W", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(8.dp).background(SolarRed, CircleShape))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Column {
+                        Text("Grid Load", fontSize = 8.sp, color = TextSecondary)
+                        Text("${metrics.loadPower.toInt()} W / 1500W", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(8.dp).background(SolarGreen, CircleShape))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Column {
+                        Text("Battery Pct", fontSize = 8.sp, color = TextSecondary)
+                        Text("${metrics.batteryPct}% (${metrics.batteryVoltage} V)", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    }
+                }
+            }
         }
     }
 }

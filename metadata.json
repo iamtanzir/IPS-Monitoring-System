@@ -1,5 +1,5 @@
 {
-  "name": "Solar Monitor",
+  "name": "Universal IPS, Hybrid Inverter, Solar Panel Monitoring System",
   "description": "A remote solar monitoring and ESP32 MQTT control dashboard with built-in AI solar engineer.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Solar Monitor"
+rootProject.name = "Universal IPS, Hybrid Inverter, Solar Panel Monitoring System"
 
 include(":app")

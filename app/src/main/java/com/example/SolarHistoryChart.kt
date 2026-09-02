@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.example.ui.theme.SolarCardBg
+import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 
 @Composable
@@ -38,7 +39,7 @@ fun SolarHistoryChart(
         Text(
             text = "Solar Power Output Trend (W)",
             style = MaterialTheme.typography.titleSmall,
-            color = Color.White
+            color = TextPrimary
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -63,7 +64,7 @@ fun SolarHistoryChart(
                 for (i in 0..gridLines) {
                     val yVal = height * i / gridLines
                     drawLine(
-                        color = Color.White.copy(alpha = 0.05f),
+                        color = Color.Black.copy(alpha = 0.05f),
                         start = Offset(0f, yVal),
                         end = Offset(width, yVal),
                         strokeWidth = 1.dp.toPx()
@@ -163,7 +164,7 @@ fun BatteryChargeBarChart(
         Text(
             text = "Battery Charge Level History (Wh)",
             style = MaterialTheme.typography.titleSmall,
-            color = Color.White
+            color = TextPrimary
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -183,7 +184,7 @@ fun BatteryChargeBarChart(
                 for (i in 0..gridLines) {
                     val yVal = height * i / gridLines
                     drawLine(
-                        color = Color.White.copy(alpha = 0.05f),
+                        color = Color.Black.copy(alpha = 0.05f),
                         start = Offset(0f, yVal),
                         end = Offset(width, yVal),
                         strokeWidth = 1.dp.toPx()
@@ -211,7 +212,7 @@ fun BatteryChargeBarChart(
 
                     // Draw small highlight border top of each bar
                     drawLine(
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = accentColor.copy(alpha = 0.8f),
                         start = Offset(left, top),
                         end = Offset(left + barWidth, top),
                         strokeWidth = 2.dp.toPx()
