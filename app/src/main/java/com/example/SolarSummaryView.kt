@@ -39,7 +39,7 @@ fun SolarSummaryView(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Tab Selector between System Analytics and Hardware BOM
         Row(
@@ -110,13 +110,64 @@ fun SolarSummaryView(
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    text = "SYSTEM SUMMARY",
+                    text = "SYSTEM SUMMARY & ANALYTICS",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = SolarCyan,
                     letterSpacing = 1.5.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
+
+                // 3-Day Cumulative Analytics Cards
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val totalYield = items.take(3).map { it.dailyYieldKwh }.sum()
+                    val totalSavings = items.take(3).map { it.savingsBdt }.sum()
+                    val totalCo2 = items.take(3).map { it.co2SavedKg }.sum()
+
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, SolarBorder),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text("3-DAY YIELD", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("${String.format("%.2f", totalYield)} kWh", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = com.example.ui.theme.SolarGold)
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, SolarBorder),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text("3-DAY SAVINGS", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("৳${String.format("%.1f", totalSavings)}", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = com.example.ui.theme.SolarGreen)
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, SolarBorder),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text("CO₂ AVOIDED", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("${String.format("%.2f", totalCo2)} kg", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = SolarCyan)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
 
         // Table Header
         Card(
@@ -244,6 +295,10 @@ private fun getRowConfigs(items: List<GridHistoricalSummary>): List<SummaryRow> 
     val b = items[2]
 
     return listOf(
+        SummaryRow("⚡ Solar Yield (kWh)", "${t.dailyYieldKwh} kWh", "${y.dailyYieldKwh} kWh", "${b.dailyYieldKwh} kWh"),
+        SummaryRow("🔌 Load Consumed (kWh)", "${t.dailyConsumptionKwh} kWh", "${y.dailyConsumptionKwh} kWh", "${b.dailyConsumptionKwh} kWh"),
+        SummaryRow("💰 Financial Savings (BDT)", "৳${t.savingsBdt}", "৳${y.savingsBdt}", "৳${b.savingsBdt}"),
+        SummaryRow("🌱 CO₂ Avoided (kg)", "${t.co2SavedKg} kg", "${y.co2SavedKg} kg", "${b.co2SavedKg} kg"),
         SummaryRow("Max PV Power (W)", "${t.maxPvPower.toInt()} W", "${y.maxPvPower.toInt()} W", "${b.maxPvPower.toInt()} W"),
         SummaryRow("Min PV Power (W)", "${t.minPvPower.toInt()} W", "${y.minPvPower.toInt()} W", "${b.minPvPower.toInt()} W"),
         SummaryRow("Avg PV Power (W)", "${t.avgPvPower} W", "${y.avgPvPower} W", "${b.avgPvPower} W"),

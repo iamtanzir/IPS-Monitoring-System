@@ -64,7 +64,7 @@ fun SolarHistoryChart(
                 for (i in 0..gridLines) {
                     val yVal = height * i / gridLines
                     drawLine(
-                        color = Color.Black.copy(alpha = 0.05f),
+                        color = Color.White.copy(alpha = 0.08f),
                         start = Offset(0f, yVal),
                         end = Offset(width, yVal),
                         strokeWidth = 1.dp.toPx()
@@ -184,7 +184,7 @@ fun BatteryChargeBarChart(
                 for (i in 0..gridLines) {
                     val yVal = height * i / gridLines
                     drawLine(
-                        color = Color.Black.copy(alpha = 0.05f),
+                        color = Color.White.copy(alpha = 0.08f),
                         start = Offset(0f, yVal),
                         end = Offset(width, yVal),
                         strokeWidth = 1.dp.toPx()

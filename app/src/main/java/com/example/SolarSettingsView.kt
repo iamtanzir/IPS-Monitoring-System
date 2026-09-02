@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
@@ -59,6 +60,9 @@ fun SolarSettingsView(
     var editedModbusAddr by remember(settings.dspModbusAddress) { mutableStateOf(settings.dspModbusAddress.toString()) }
     var editedVaRating by remember(settings.ipsOutputRatingVa) { mutableStateOf(settings.ipsOutputRatingVa.toString()) }
     var editedBatteryType by remember(settings.batteryTypeSelected) { mutableStateOf(settings.batteryTypeSelected) }
+    var editedTariff by remember(settings.gridElectricityTariffBdt) { mutableStateOf(settings.gridElectricityTariffBdt.toString()) }
+    var editedEsp32Ip by remember(settings.localEsp32Ip) { mutableStateOf(settings.localEsp32Ip) }
+    var editedMdnsUrl by remember(settings.localMdnsUrl) { mutableStateOf(settings.localMdnsUrl) }
     var showBomDialog by remember { mutableStateOf(false) }
 
     if (showBomDialog) {
@@ -70,8 +74,8 @@ fun SolarSettingsView(
             .fillMaxSize()
             .verticalScroll(scrollState)
             .padding(horizontal = 16.dp)
-            .padding(bottom = 32.dp, top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(bottom = 32.dp, top = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
             text = "DASHBOARD CUSTOMIZER & SETTINGS",
@@ -79,7 +83,7 @@ fun SolarSettingsView(
             fontWeight = FontWeight.Bold,
             color = SolarCyan,
             letterSpacing = 1.5.sp,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 4.dp)
         )
 
         // Collapsible Help & ESP32 Pairing Guide
@@ -439,20 +443,131 @@ fun SolarSettingsView(
                     )
 
                     OutlinedTextField(
-                        value = editedBatteryType,
+                        value = editedTariff,
                         onValueChange = {
-                            editedBatteryType = it
-                            viewModel.saveSettings(settings.copy(batteryTypeSelected = it))
+                            editedTariff = it
+                            val tariff = it.toFloatOrNull() ?: 8.50f
+                            viewModel.saveSettings(settings.copy(gridElectricityTariffBdt = tariff))
                         },
-                        label = { Text("Battery Type Preset", color = TextSecondary) },
+                        label = { Text("Electricity Tariff (৳/kWh)", color = TextSecondary) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = TextPrimary,
                             unfocusedTextColor = TextPrimary,
                             focusedBorderColor = SolarCyan,
                             unfocusedBorderColor = SolarBorder
                         ),
-                        modifier = Modifier.weight(1.5f)
+                        modifier = Modifier.weight(1.2f)
                     )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Battery Chemistry Presets
+                Text(
+                    text = "Battery Chemistry Profile (রসায়ন প্রযুক্তি)",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    listOf(
+                        "LFP (LiFePO4)" to "Lithium 3.2V",
+                        "Gel Deep Cycle" to "Maintenance-Free",
+                        "Tubular Lead-Acid" to "Deep Flooded"
+                    ).forEach { (bType, sub) ->
+                        val isSelected = settings.batteryTypeSelected.contains(bType.take(3), ignoreCase = true)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (isSelected) SolarCyan.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.04f))
+                                .border(
+                                    width = if (isSelected) 1.2.dp else 0.6.dp,
+                                    color = if (isSelected) SolarCyan else SolarBorder,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .clickable {
+                                    editedBatteryType = bType
+                                    viewModel.saveSettings(settings.copy(batteryTypeSelected = bType))
+                                }
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = bType,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) SolarCyan else TextPrimary,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = sub,
+                                    fontSize = 8.sp,
+                                    color = TextSecondary,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Inverter Mode Priority Selector
+                Text(
+                    text = "Inverter Operation Mode Priority (পাওয়ার রাউটিং প্রায়োরিটি)",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                val currentMode = viewModel.metrics.collectAsState().value.operationalMode
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    listOf(
+                        Triple("SBU", "Solar Priority", "Max BDT Savings"),
+                        Triple("SUB", "Solar-Utility", "Grid Load Backup"),
+                        Triple("USB", "Utility Priority", "Standard UPS")
+                    ).forEach { (mode, title, desc) ->
+                        val isSel = currentMode == mode
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (isSel) SolarGold.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.04f))
+                                .border(
+                                    width = if (isSel) 1.2.dp else 0.6.dp,
+                                    color = if (isSel) SolarGold else SolarBorder,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .clickable { viewModel.setOperationalMode(mode) }
+                                .padding(8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = mode,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (isSel) SolarGold else TextPrimary
+                                )
+                                Text(
+                                    text = title,
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSel) TextPrimary else TextSecondary,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -583,7 +698,7 @@ fun SolarSettingsView(
             }
         }
 
-        // 4. MQTT Connection Broker Config (Direct Cloud Deployment Connection Details!)
+        // 4. Private Solar Architecture & Network Connection (Local-First LAN vs Private MQTT)
         Card(
             colors = CardDefaults.cardColors(containerColor = SolarCardBg),
             border = CardBorder(SolarBorder),
@@ -596,7 +711,7 @@ fun SolarSettingsView(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Cloud MQTT Broker Configuration",
+                        text = "Private Connection & Telemetry Mode",
                         style = MaterialTheme.typography.titleSmall,
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
@@ -607,88 +722,221 @@ fun SolarSettingsView(
                             .border(1.dp, SolarGreen, RoundedCornerShape(4.dp))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
-                        Text("Active Mock Server", color = SolarGreen, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = if (settings.isLocalPrivateLanMode) "100% PRIVATE LAN" else "CUSTOM MQTT",
+                            color = SolarGreen,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "ESP32 থেকে সরাসরি ক্লাউড ডাটাবেসে কানেক্ট করার জন্য MQTT Broker সেটআপ প্যারামিটার সেট করুন।",
+                    text = "প্রাইভেট সোলার আর্কিটেকচার: ক্লাউড ছাড়া সরাসরি লোকাল নেটওয়ার্কে অথবা নিজস্ব সেলফ-হোস্টেড ব্রোকারে ডাটা আদান-প্রদান করুন।",
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary,
                     fontSize = 11.sp
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
-                 OutlinedTextField(
-                    value = editedBroker,
-                    onValueChange = {
-                        editedBroker = it
-                        viewModel.saveSettings(settings.copy(mqttBrokerUrl = it))
-                    },
-                    label = { Text("MQTT Broker Address (e.g. HiveMQ, EMQX)", color = TextSecondary) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary,
-                        focusedBorderColor = SolarCyan,
-                        unfocusedBorderColor = SolarBorder
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // Mode Selector Buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Local LAN Button
+                    val isLan = settings.isLocalPrivateLanMode
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (isLan) SolarCyan.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.04f))
+                            .border(
+                                width = if (isLan) 1.5.dp else 0.8.dp,
+                                color = if (isLan) SolarCyan else SolarBorder,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .clickable {
+                                viewModel.saveSettings(settings.copy(isLocalPrivateLanMode = true))
+                            }
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "🔒 Local Direct LAN",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isLan) SolarCyan else TextPrimary
+                            )
+                            Text(
+                                text = "Zero Cloud Leak",
+                                fontSize = 8.sp,
+                                color = if (isLan) SolarCyan.copy(alpha = 0.8f) else TextSecondary
+                            )
+                        }
+                    }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = editedPort,
-                        onValueChange = {
-                            editedPort = it
-                            val portInt = it.toIntOrNull() ?: 1883
-                            viewModel.saveSettings(settings.copy(mqttPort = portInt))
-                        },
-                        label = { Text("Port", color = TextSecondary) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary,
-                            focusedBorderColor = SolarCyan,
-                            unfocusedBorderColor = SolarBorder
-                        ),
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    OutlinedTextField(
-                        value = editedClientId,
-                        onValueChange = {
-                            editedClientId = it
-                            viewModel.saveSettings(settings.copy(mqttClientId = it))
-                        },
-                        label = { Text("Client ID", color = TextSecondary) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextPrimary,
-                            unfocusedTextColor = TextPrimary,
-                            focusedBorderColor = SolarCyan,
-                            unfocusedBorderColor = SolarBorder
-                        ),
-                        modifier = Modifier.weight(2f)
-                    )
+                    // Private MQTT Button
+                    val isMqtt = !settings.isLocalPrivateLanMode
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (isMqtt) SolarGold.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.04f))
+                            .border(
+                                width = if (isMqtt) 1.5.dp else 0.8.dp,
+                                color = if (isMqtt) SolarGold else SolarBorder,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .clickable {
+                                viewModel.saveSettings(settings.copy(isLocalPrivateLanMode = false))
+                            }
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "🌐 Private MQTT",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isMqtt) SolarGold else TextPrimary
+                            )
+                            Text(
+                                text = "Custom Broker / WAN",
+                                fontSize = 8.sp,
+                                color = if (isMqtt) SolarGold.copy(alpha = 0.8f) else TextSecondary
+                            )
+                        }
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                OutlinedTextField(
-                    value = editedTopic,
-                    onValueChange = {
-                        editedTopic = it
-                        viewModel.saveSettings(settings.copy(mqttTopicPrefix = it))
-                    },
-                    label = { Text("MQTT Root Topic", color = TextSecondary) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary,
-                        focusedBorderColor = SolarCyan,
-                        unfocusedBorderColor = SolarBorder
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (settings.isLocalPrivateLanMode) {
+                    // Privacy Guarantee Card
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(SolarGreen.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
+                            .border(1.dp, SolarGreen.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                            .padding(10.dp)
+                    ) {
+                        Text(
+                            text = "🛡️ 100% Local Data Ownership: সমস্ত সেন্সর ডাটা শুধুমাত্র মোবাইল ও ESP32-C6 এর মধ্যে লোকাল ওয়াইফাই/হটস্পটের মাধ্যমে ট্রান্সমিট হয়। কোন ডাটা ক্লাউডে পাঠানো হয় না।",
+                            fontSize = 10.sp,
+                            color = SolarGreen,
+                            lineHeight = 14.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = editedEsp32Ip,
+                        onValueChange = {
+                            editedEsp32Ip = it
+                            viewModel.saveSettings(settings.copy(localEsp32Ip = it))
+                        },
+                        label = { Text("ESP32-C6 Local Static IP Address", color = TextSecondary) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = SolarCyan,
+                            unfocusedBorderColor = SolarBorder
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = editedMdnsUrl,
+                        onValueChange = {
+                            editedMdnsUrl = it
+                            viewModel.saveSettings(settings.copy(localMdnsUrl = it))
+                        },
+                        label = { Text("mDNS Domain (e.g. solar-esp32.local)", color = TextSecondary) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = SolarCyan,
+                            unfocusedBorderColor = SolarBorder
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = editedBroker,
+                        onValueChange = {
+                            editedBroker = it
+                            viewModel.saveSettings(settings.copy(mqttBrokerUrl = it))
+                        },
+                        label = { Text("MQTT Broker Address (e.g. HiveMQ, EMQX, Mosquitto)", color = TextSecondary) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = SolarCyan,
+                            unfocusedBorderColor = SolarBorder
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = editedPort,
+                            onValueChange = {
+                                editedPort = it
+                                val portInt = it.toIntOrNull() ?: 1883
+                                viewModel.saveSettings(settings.copy(mqttPort = portInt))
+                            },
+                            label = { Text("Port", color = TextSecondary) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = TextPrimary,
+                                unfocusedTextColor = TextPrimary,
+                                focusedBorderColor = SolarCyan,
+                                unfocusedBorderColor = SolarBorder
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        OutlinedTextField(
+                            value = editedClientId,
+                            onValueChange = {
+                                editedClientId = it
+                                viewModel.saveSettings(settings.copy(mqttClientId = it))
+                            },
+                            label = { Text("Client ID", color = TextSecondary) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = TextPrimary,
+                                unfocusedTextColor = TextPrimary,
+                                focusedBorderColor = SolarCyan,
+                                unfocusedBorderColor = SolarBorder
+                            ),
+                            modifier = Modifier.weight(2f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = editedTopic,
+                        onValueChange = {
+                            editedTopic = it
+                            viewModel.saveSettings(settings.copy(mqttTopicPrefix = it))
+                        },
+                        label = { Text("MQTT Root Topic", color = TextSecondary) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = SolarCyan,
+                            unfocusedBorderColor = SolarBorder
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
 

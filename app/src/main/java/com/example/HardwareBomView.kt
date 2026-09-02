@@ -110,7 +110,8 @@ fun HardwareBomDialog(
                             onClick = onDismiss,
                             modifier = Modifier
                                 .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.08f), CircleShape)
+                                .background(SolarCardElevated, CircleShape)
+                                .border(1.dp, SolarBorder, CircleShape)
                         ) {
                             Icon(Icons.Default.Close, contentDescription = "Close", tint = TextPrimary, modifier = Modifier.size(18.dp))
                         }
@@ -345,7 +346,8 @@ fun HardwareBomContent(modifier: Modifier = Modifier) {
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White.copy(alpha = 0.04f), RoundedCornerShape(8.dp))
+                            .background(SolarCardElevated, RoundedCornerShape(8.dp))
+                            .border(1.dp, SolarBorder, RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     ) {
                         PinoutRow(pin = "GPIO 1 (ADC1)", wireColor = "#EC4899", desc = "ACS712 কারেন্ট সেন্সর (১k/২k ভোল্টেজ ডিভায়ডার সহ)")
@@ -600,7 +602,7 @@ fun BomItemCard(item: BomItem) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.White.copy(alpha = 0.04f), RoundedCornerShape(8.dp))
+                            .background(SolarCardElevated, RoundedCornerShape(8.dp))
                             .border(1.dp, SolarCyan.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     ) {

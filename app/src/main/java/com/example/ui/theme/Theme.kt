@@ -9,13 +9,42 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = SolarCyan,
+    onPrimary = Color.Black,
+    primaryContainer = Color(0xFF00363D),
+    onPrimaryContainer = Color(0xFF80F2FF),
+
     secondary = SolarGold,
+    onSecondary = Color.Black,
+    secondaryContainer = Color(0xFF3E2D00),
+    onSecondaryContainer = Color(0xFFFFE082),
+
     tertiary = SolarGreen,
+    onTertiary = Color.Black,
+    tertiaryContainer = Color(0xFF003919),
+    onTertiaryContainer = Color(0xFFB9F6CA),
+
     background = SolarBgDark,
-    surface = SolarCardBg,
     onBackground = TextPrimary,
+
+    surface = SolarCardBg,
     onSurface = TextPrimary,
-    outline = SolarBorder
+    surfaceVariant = SolarCardElevated,
+    onSurfaceVariant = TextSecondary,
+
+    surfaceContainerLowest = Color(0xFF000000),
+    surfaceContainerLow = Color(0xFF0A0A0E),
+    surfaceContainer = Color(0xFF101014),
+    surfaceContainerHigh = Color(0xFF16161C),
+    surfaceContainerHighest = Color(0xFF1E1E26),
+
+    surfaceTint = Color.Transparent, // PREVENT muddy M3 tonal elevation tinting
+    outline = SolarBorder,
+    outlineVariant = Color(0xFF1C1C24),
+
+    error = SolarRed,
+    onError = Color.White,
+    errorContainer = Color(0xFF4D0014),
+    onErrorContainer = Color(0xFFFFB4AB)
 )
 
 private val LightColorScheme = lightColorScheme(

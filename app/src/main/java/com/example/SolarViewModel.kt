@@ -68,7 +68,19 @@ data class SolarMetrics(
     val isAutoCutTripped: Boolean = false,
     val isShortCircuitSafe: Boolean = true,
     val isSurgeProtected: Boolean = true,
-    val isOverTemperature: Boolean = false
+    val isOverTemperature: Boolean = false,
+
+    // Professional Solar Monitoring & Analytics (75way Guide & ESP32-C6 Sensors)
+    val dailyYieldKwh: Float = 3.85f,
+    val dailyConsumptionKwh: Float = 2.92f,
+    val costSavingsBdt: Float = 32.72f,
+    val co2SavedKg: Float = 3.16f,
+    val ambientLux: Int = 68400, // BH1750 on GPIO 6/7
+    val solarIrradianceWm2: Float = 547.0f,
+    val peakSunHours: Float = 4.6f,
+    val performanceRatioPct: Int = 92,
+    val operationalMode: String = "SBU", // SBU (Solar Priority), SUB (Hybrid Priority), USB (Grid UPS Priority)
+    val systemHealthScore: Int = 98
 )
 
 data class GridHistoricalSummary(
@@ -94,7 +106,11 @@ data class GridHistoricalSummary(
     val loadFromBatteryWh: Float,
     val maxDischargeAmp: Float,
     val minDischargeAmp: Float,
-    val avgDischargeAmp: Float
+    val avgDischargeAmp: Float,
+    val dailyYieldKwh: Float = 3.85f,
+    val dailyConsumptionKwh: Float = 2.92f,
+    val savingsBdt: Float = 32.7f,
+    val co2SavedKg: Float = 3.16f
 )
 
 data class CustomizerSettings(
@@ -108,6 +124,7 @@ data class CustomizerSettings(
     val lowBatteryAlertLimit: Float = 11.5f,
     val maxBatteryChargeCurrent: Float = 40.0f,
     val inverterCutOffVoltage: Float = 10.8f,
+    val gridElectricityTariffBdt: Float = 8.50f, // ৳ per kWh in Bangladesh for financial savings calculation
     
     // MQTT connection simulation
     val mqttBrokerUrl: String = "broker.hivemq.com",
@@ -115,6 +132,11 @@ data class CustomizerSettings(
     val mqttTopicPrefix: String = "smart/solar/solar01",
     val mqttClientId: String = "solar_monitor_mobile_01",
     val isMqttConnected: Boolean = true,
+
+    // Private Solar & Local-First Direct Connection (ESP32-C6 WebServer/mDNS)
+    val isLocalPrivateLanMode: Boolean = true,
+    val localEsp32Ip: String = "192.168.4.1",
+    val localMdnsUrl: String = "solar-esp32.local",
 
     // DSP/IPS Manufacturer & Builder Integration Settings
     val deviceSerialNumber: String = "IPS-DSP-2026-X88",
@@ -250,7 +272,11 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             loadFromBatteryWh = 17.48f,
             maxDischargeAmp = 5.21f,
             minDischargeAmp = 1.78f,
-            avgDischargeAmp = 2.86f
+            avgDischargeAmp = 2.86f,
+            dailyYieldKwh = 3.85f,
+            dailyConsumptionKwh = 2.92f,
+            savingsBdt = 32.72f,
+            co2SavedKg = 3.16f
         ),
         GridHistoricalSummary(
             dateLabel = "Yesterday",
@@ -275,7 +301,11 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             loadFromBatteryWh = 36.05f,
             maxDischargeAmp = 5.28f,
             minDischargeAmp = 1.80f,
-            avgDischargeAmp = 3.27f
+            avgDischargeAmp = 3.27f,
+            dailyYieldKwh = 4.12f,
+            dailyConsumptionKwh = 3.40f,
+            savingsBdt = 35.02f,
+            co2SavedKg = 3.38f
         ),
         GridHistoricalSummary(
             dateLabel = "Before yesterday",
@@ -300,7 +330,11 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             loadFromBatteryWh = 100.55f,
             maxDischargeAmp = 4.63f,
             minDischargeAmp = 1.37f,
-            avgDischargeAmp = 3.49f
+            avgDischargeAmp = 3.49f,
+            dailyYieldKwh = 2.45f,
+            dailyConsumptionKwh = 2.80f,
+            savingsBdt = 20.82f,
+            co2SavedKg = 2.01f
         )
     )
 
@@ -333,10 +367,35 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
                     newBatteryVolt = ((newBatteryVolt * 10).roundToInt() / 10.0f)
                     newPanelCurr = ((newPanelCurr * 100).roundToInt() / 100.0f)
                     
+                    // Fluctuate ambient light & irradiance from BH1750 (GPIO 6/7)
+                    val luxDelta = if (current.isSolarOn) ((-12..12).random() * 60) else 0
+                    val newLux = if (current.isSolarOn) (current.ambientLux + luxDelta).coerceIn(45000, 85000) else 120
+                    val newIrradiance = ((newLux / 125.0f) * 10).roundToInt() / 10.0f
+                    
+                    // Increment yield slightly if solar active
+                    val yieldIncrement = if (current.isSolarOn && !current.isAutoCutTripped) 0.0002f else 0.0f
+                    val newDailyYield = ((current.dailyYieldKwh + yieldIncrement) * 1000).roundToInt() / 1000.0f
+                    val newSavingsBdt = ((newDailyYield * _settings.value.gridElectricityTariffBdt) * 100).roundToInt() / 100.0f
+                    val newCo2Saved = ((newDailyYield * 0.82f) * 100).roundToInt() / 100.0f
+
+                    val healthScore = when {
+                        current.isAutoCutTripped -> 45
+                        current.isOverVoltage || current.isOverCurrent || current.isOverTemperature -> 70
+                        newBatteryVolt < _settings.value.lowBatteryAlertLimit -> 82
+                        !current.isShortCircuitSafe -> 85
+                        else -> 98
+                    }
+
                     val updated = current.copy(
                         panelVoltage = newPanelVolt,
                         panelCurrent = newPanelCurr,
-                        batteryVoltage = newBatteryVolt
+                        batteryVoltage = newBatteryVolt,
+                        ambientLux = newLux,
+                        solarIrradianceWm2 = newIrradiance,
+                        dailyYieldKwh = newDailyYield,
+                        costSavingsBdt = newSavingsBdt,
+                        co2SavedKg = newCo2Saved,
+                        systemHealthScore = healthScore
                     )
                     updateMetrics(updated)
 
@@ -372,6 +431,7 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
         val lowBatteryAlertLimit = prefs.getFloat("low_battery_limit", 11.5f)
         val maxBatteryChargeCurrent = prefs.getFloat("max_battery_charge_current", 40.0f)
         val inverterCutOffVoltage = prefs.getFloat("inverter_cut_off_voltage", 10.8f)
+        val gridElectricityTariffBdt = prefs.getFloat("grid_tariff_bdt", 8.50f)
         
         val mqttBroker = prefs.getString("mqtt_broker", "broker.hivemq.com") ?: "broker.hivemq.com"
         val mqttPort = prefs.getInt("mqtt_port", 1883)
@@ -391,6 +451,10 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
         val ipsOutputRatingVa = prefs.getInt("ips_output_va", 1000)
         val batteryTypeSelected = prefs.getString("battery_type_selected", "Tall Tubular Lead-Acid") ?: "Tall Tubular Lead-Acid"
 
+        val isLocalPrivateLanMode = prefs.getBoolean("local_lan_mode", true)
+        val localEsp32Ip = prefs.getString("local_esp32_ip", "192.168.4.1") ?: "192.168.4.1"
+        val localMdnsUrl = prefs.getString("local_mdns_url", "solar-esp32.local") ?: "solar-esp32.local"
+
         _settings.value = CustomizerSettings(
             customSolarName = customSolarName,
             selectedAccentHex = selectedAccentHex,
@@ -402,11 +466,15 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             lowBatteryAlertLimit = lowBatteryAlertLimit,
             maxBatteryChargeCurrent = maxBatteryChargeCurrent,
             inverterCutOffVoltage = inverterCutOffVoltage,
+            gridElectricityTariffBdt = gridElectricityTariffBdt,
             mqttBrokerUrl = mqttBroker,
             mqttPort = mqttPort,
             mqttTopicPrefix = mqttPrefix,
             mqttClientId = mqttClient,
             isMqttConnected = true,
+            isLocalPrivateLanMode = isLocalPrivateLanMode,
+            localEsp32Ip = localEsp32Ip,
+            localMdnsUrl = localMdnsUrl,
             deviceSerialNumber = deviceSerialNumber,
             installerName = installerName,
             installerPhone = installerPhone,
@@ -430,10 +498,14 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             putFloat("low_battery_limit", updated.lowBatteryAlertLimit)
             putFloat("max_battery_charge_current", updated.maxBatteryChargeCurrent)
             putFloat("inverter_cut_off_voltage", updated.inverterCutOffVoltage)
+            putFloat("grid_tariff_bdt", updated.gridElectricityTariffBdt)
             putString("mqtt_broker", updated.mqttBrokerUrl)
             putInt("mqtt_port", updated.mqttPort)
             putString("mqtt_prefix", updated.mqttTopicPrefix)
             putString("mqtt_client", updated.mqttClientId)
+            putBoolean("local_lan_mode", updated.isLocalPrivateLanMode)
+            putString("local_esp32_ip", updated.localEsp32Ip)
+            putString("local_mdns_url", updated.localMdnsUrl)
             
             putString("device_sn", updated.deviceSerialNumber)
             putString("installer_name", updated.installerName)
@@ -478,6 +550,23 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
         val current = _metrics.value
         val newState = !current.isGridOn
         updateMetrics(current.copy(isGridOn = newState))
+    }
+
+    // Operational Inverter Mode Control (SBU, SUB, USB)
+    fun setOperationalMode(mode: String) {
+        val current = _metrics.value
+        updateMetrics(current.copy(operationalMode = mode))
+        val modeDesc = when (mode) {
+            "SBU" -> "Solar > Battery > Utility Priority active. Maximizing solar self-consumption and battery cycling for minimal electric bill."
+            "SUB" -> "Solar > Utility > Battery Priority active. Solar supplies load first, grid supplements deficit, keeping battery 100% reserved for load shedding."
+            "USB" -> "Utility > Solar > Battery (Standard UPS) active. AC Grid takes main load, solar keeps battery at float voltage."
+            else -> "Inverter operational mode set to $mode."
+        }
+        triggerNotification(
+            title = "Mode Switched: $mode Priority",
+            message = modeDesc,
+            severity = "info"
+        )
     }
 
     // Manual test injection triggers
@@ -529,60 +618,131 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             0.0f
         }
 
-        // Determine battery state & flow and source shares
+        // Determine battery state & flow and source shares based on Operational Mode (SBU / SUB / USB)
         var batteryCurrent = 0.0f
         var loadSource = "Solar"
         var loadPanelW = 0.0f
         var loadBatteryW = 0.0f
         var loadGridW = 0.0f
 
-        if (newMetrics.isSolarOn && solarPower >= loadPower) {
-            // Solar powers the load entirely and charges battery with leftover
-            loadSource = "Solar"
-            loadPanelW = loadPower
-            loadBatteryW = 0.0f
-            loadGridW = 0.0f
-
-            if (newMetrics.isChargingOn) {
-                val chargePower = solarPower - loadPower
-                // Charge battery (positive charge current)
-                batteryCurrent = chargePower / newMetrics.batteryVoltage
-            }
-        } else if (newMetrics.isSolarOn && solarPower > 0f) {
-            // Solar is generating, but not enough for full load
-            loadPanelW = solarPower
-            val deficit = loadPower - solarPower
-
-            if (newMetrics.batteryVoltage > 11.2f) {
-                loadBatteryW = deficit
-                loadSource = "Solar + Battery"
-                batteryCurrent = -deficit / newMetrics.batteryVoltage
-            } else if (newMetrics.isGridOn) {
-                loadGridW = deficit
-                loadSource = "Solar + Grid Bypass"
-                batteryCurrent = 0.0f
-            } else {
-                loadBatteryW = deficit
-                loadSource = "Solar + Battery (Low)"
-                batteryCurrent = -deficit / newMetrics.batteryVoltage
-            }
-        } else {
-            // Solar is OFF or 0W (night / disabled)
-            loadPanelW = 0.0f
-            if (newMetrics.isGridOn) {
-                loadGridW = loadPower
-                loadBatteryW = 0.0f
-                loadSource = "AC Grid Bypass"
-                if (newMetrics.isChargingOn && newMetrics.batteryPct < 95) {
-                    batteryCurrent = 2.5f
+        when (newMetrics.operationalMode) {
+            "USB" -> {
+                // Utility Priority (Standard UPS Mode)
+                if (newMetrics.isGridOn) {
+                    loadGridW = loadPower
+                    loadSource = "AC Grid Priority (USB)"
+                    loadPanelW = 0.0f
+                    loadBatteryW = 0.0f
+                    if (newMetrics.isSolarOn && newMetrics.isChargingOn) {
+                        batteryCurrent = (solarPower / newMetrics.batteryVoltage).coerceIn(0f, 15f)
+                    } else if (newMetrics.isChargingOn && newMetrics.batteryPct < 98) {
+                        batteryCurrent = 2.5f
+                    }
                 } else {
-                    batteryCurrent = 0.0f
+                    // Outage fallback to Solar / Battery
+                    if (newMetrics.isSolarOn && solarPower >= loadPower) {
+                        loadSource = "Solar (Grid Outage)"
+                        loadPanelW = loadPower
+                        if (newMetrics.isChargingOn) {
+                            batteryCurrent = (solarPower - loadPower) / newMetrics.batteryVoltage
+                        }
+                    } else {
+                        loadSource = "Battery Inverter (Grid Outage)"
+                        loadPanelW = if (newMetrics.isSolarOn) solarPower else 0f
+                        val deficit = loadPower - loadPanelW
+                        loadBatteryW = deficit
+                        batteryCurrent = if (newMetrics.batteryVoltage > 0) -deficit / newMetrics.batteryVoltage else 0f
+                    }
                 }
-            } else {
-                loadBatteryW = loadPower
-                loadGridW = 0.0f
-                loadSource = "Battery Inverter"
-                batteryCurrent = if (newMetrics.batteryVoltage > 0) -loadPower / newMetrics.batteryVoltage else 0f
+            }
+            "SUB" -> {
+                // Solar > Utility > Battery (Preserve battery reserve for load shedding)
+                if (newMetrics.isSolarOn && solarPower >= loadPower) {
+                    loadSource = "Solar (SUB)"
+                    loadPanelW = loadPower
+                    loadBatteryW = 0.0f
+                    loadGridW = 0.0f
+                    if (newMetrics.isChargingOn) {
+                        batteryCurrent = (solarPower - loadPower) / newMetrics.batteryVoltage
+                    }
+                } else if (newMetrics.isSolarOn && solarPower > 0f) {
+                    loadPanelW = solarPower
+                    val deficit = loadPower - solarPower
+                    if (newMetrics.isGridOn) {
+                        loadGridW = deficit
+                        loadBatteryW = 0.0f
+                        loadSource = "Solar + Grid (SUB)"
+                        batteryCurrent = if (newMetrics.isChargingOn && newMetrics.batteryPct < 98) 1.5f else 0.0f
+                    } else {
+                        loadBatteryW = deficit
+                        loadGridW = 0.0f
+                        loadSource = "Solar + Battery (Grid Down)"
+                        batteryCurrent = -deficit / newMetrics.batteryVoltage
+                    }
+                } else {
+                    // Solar 0W
+                    loadPanelW = 0.0f
+                    if (newMetrics.isGridOn) {
+                        loadGridW = loadPower
+                        loadBatteryW = 0.0f
+                        loadSource = "AC Grid (SUB)"
+                        batteryCurrent = if (newMetrics.isChargingOn && newMetrics.batteryPct < 98) 2.0f else 0.0f
+                    } else {
+                        loadBatteryW = loadPower
+                        loadGridW = 0.0f
+                        loadSource = "Battery Inverter (Grid Down)"
+                        batteryCurrent = if (newMetrics.batteryVoltage > 0) -loadPower / newMetrics.batteryVoltage else 0f
+                    }
+                }
+            }
+            else -> {
+                // Default "SBU" (Solar > Battery > Utility) for maximum bill reduction
+                if (newMetrics.isSolarOn && solarPower >= loadPower) {
+                    loadSource = "Solar"
+                    loadPanelW = loadPower
+                    loadBatteryW = 0.0f
+                    loadGridW = 0.0f
+
+                    if (newMetrics.isChargingOn) {
+                        val chargePower = solarPower - loadPower
+                        batteryCurrent = chargePower / newMetrics.batteryVoltage
+                    }
+                } else if (newMetrics.isSolarOn && solarPower > 0f) {
+                    loadPanelW = solarPower
+                    val deficit = loadPower - solarPower
+
+                    if (newMetrics.batteryVoltage > 11.2f) {
+                        loadBatteryW = deficit
+                        loadSource = "Solar + Battery"
+                        batteryCurrent = -deficit / newMetrics.batteryVoltage
+                    } else if (newMetrics.isGridOn) {
+                        loadGridW = deficit
+                        loadSource = "Solar + Grid Bypass"
+                        batteryCurrent = 0.0f
+                    } else {
+                        loadBatteryW = deficit
+                        loadSource = "Solar + Battery (Low)"
+                        batteryCurrent = -deficit / newMetrics.batteryVoltage
+                    }
+                } else {
+                    // Solar is OFF or 0W (night / disabled)
+                    loadPanelW = 0.0f
+                    if (newMetrics.isGridOn) {
+                        loadGridW = loadPower
+                        loadBatteryW = 0.0f
+                        loadSource = "AC Grid Bypass"
+                        if (newMetrics.isChargingOn && newMetrics.batteryPct < 95) {
+                            batteryCurrent = 2.5f
+                        } else {
+                            batteryCurrent = 0.0f
+                        }
+                    } else {
+                        loadBatteryW = loadPower
+                        loadGridW = 0.0f
+                        loadSource = "Battery Inverter"
+                        batteryCurrent = if (newMetrics.batteryVoltage > 0) -loadPower / newMetrics.batteryVoltage else 0f
+                    }
+                }
             }
         }
 

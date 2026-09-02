@@ -49,8 +49,8 @@ fun SolarHomeView(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(bottom = 24.dp, top = 8.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(bottom = 24.dp, top = 4.dp)
     ) {
         // 0. Live Material3 Notification Alerts Banner
         if (notifications.isNotEmpty()) {
@@ -130,7 +130,7 @@ fun SolarHomeView(
                                 )
                             )
                         )
-                        .padding(20.dp)
+                        .padding(14.dp)
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
@@ -148,14 +148,14 @@ fun SolarHomeView(
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = "Universal IPS, Inverter & Solar Monitoring",
+                                        text = "Private Solar • Local ESP32-C6",
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = TextSecondary,
-                                        letterSpacing = 1.sp
+                                        color = SolarCyan,
+                                        letterSpacing = 0.5.sp
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = settings.customSolarName,
                                     style = MaterialTheme.typography.titleLarge,
@@ -164,16 +164,16 @@ fun SolarHomeView(
                                 )
                             }
                             // Visual Connection Status Pill
-                            val isMqttOnline = settings.isMqttConnected && viewModel.isPaired.collectAsState().value
+                            val isOnline = (if (settings.isLocalPrivateLanMode) true else settings.isMqttConnected) && viewModel.isPaired.collectAsState().value
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        color = if (isMqttOnline) Color(0xFF2E7D32).copy(alpha = 0.12f) else SolarRed.copy(alpha = 0.12f),
+                                        color = if (isOnline) Color(0xFF2E7D32).copy(alpha = 0.15f) else SolarRed.copy(alpha = 0.12f),
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = if (isMqttOnline) Color(0xFF2E7D32) else SolarRed,
+                                        color = if (isOnline) Color(0xFF2E7D32) else SolarRed,
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -193,22 +193,24 @@ fun SolarHomeView(
                                         modifier = Modifier
                                             .size(6.dp)
                                             .background(
-                                                color = if (isMqttOnline) Color(0xFF2E7D32).copy(alpha = beaconAlpha) else SolarRed.copy(alpha = beaconAlpha),
+                                                color = if (isOnline) Color(0xFF2E7D32).copy(alpha = beaconAlpha) else SolarRed.copy(alpha = beaconAlpha),
                                                 shape = CircleShape
                                             )
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = if (isMqttOnline) "ESP32 ONLINE" else "ESP32 OFFLINE",
+                                        text = if (isOnline) {
+                                            if (settings.isLocalPrivateLanMode) "LOCAL PRIVATE LAN" else "PRIVATE MQTT"
+                                        } else "ESP32 OFFLINE",
                                         fontSize = 8.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = if (isMqttOnline) Color(0xFF2E7D32) else SolarRed
+                                        color = if (isOnline) Color(0xFF2E7D32) else SolarRed
                                     )
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         // Dynamic Row of badges representing system metadata
                         Row(
@@ -218,48 +220,55 @@ fun SolarHomeView(
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .background(Color.White.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .border(1.dp, SolarBorder, RoundedCornerShape(12.dp))
-                                    .padding(8.dp)
+                                    .background(Color(0xFF14141C), RoundedCornerShape(12.dp))
+                                    .border(1.dp, Color(0xFF282836), RoundedCornerShape(12.dp))
+                                    .padding(vertical = 8.dp, horizontal = 10.dp)
                             ) {
                                 Column {
                                     Text("DAILY YIELD", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                                    Text("3.8 kWh", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text("${metrics.dailyYieldKwh} kWh", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
                                 }
                             }
                             Box(
                                 modifier = Modifier
-                                    .weight(1.5f)
-                                    .background(Color.White.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .border(1.dp, SolarBorder, RoundedCornerShape(12.dp))
-                                    .padding(8.dp)
+                                    .weight(1.3f)
+                                    .background(Color(0xFF14141C), RoundedCornerShape(12.dp))
+                                    .border(1.dp, Color(0xFF282836), RoundedCornerShape(12.dp))
+                                    .padding(vertical = 8.dp, horizontal = 10.dp)
                             ) {
                                 Column {
-                                    Text("WEATHER", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                                    Text("☀️ 32°C Sunny", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                                    Text("IRRADIANCE", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text("${metrics.solarIrradianceWm2} W/m²", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = SolarGold)
                                 }
                             }
                             Box(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .background(Color.White.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
-                                    .border(1.dp, SolarBorder, RoundedCornerShape(12.dp))
-                                    .padding(8.dp)
+                                    .weight(1.1f)
+                                    .background(Color(0xFF14141C), RoundedCornerShape(12.dp))
+                                    .border(1.dp, Color(0xFF282836), RoundedCornerShape(12.dp))
+                                    .padding(vertical = 8.dp, horizontal = 10.dp)
                             ) {
                                 Column {
-                                    Text("STATION EFF.", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                                    Text("94.2%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                    Text("SAVINGS", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text("৳${metrics.costSavingsBdt}", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = SolarGreen)
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         LivePowerBalanceDialGauge(metrics = metrics)
-                        Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         // MQTT and Connection Pulse Status Bar
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFF0F0F16), RoundedCornerShape(10.dp))
+                                .border(1.dp, Color(0xFF1E1E2A), RoundedCornerShape(10.dp))
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -274,25 +283,27 @@ fun SolarHomeView(
                             )
                             Box(
                                 modifier = Modifier
-                                    .size(10.dp)
+                                    .size(8.dp)
                                     .background(
-                                        color = if (metrics.isSolarOn) Color(0xFF2E7D32).copy(alpha = pulseAlpha) else Color.Gray,
+                                        color = if (metrics.isSolarOn) SolarGreen.copy(alpha = pulseAlpha) else Color.Gray,
                                         shape = CircleShape
                                     )
-                                    .border(1.dp, Color.White, CircleShape)
+                                    .border(1.dp, if (metrics.isSolarOn) SolarGreen else Color.LightGray, CircleShape)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = if (metrics.isSolarOn) "MQTT: HiveMQ Cloud Connected" else "MQTT: Offline / No Signal",
-                                style = MaterialTheme.typography.bodySmall,
+                                text = if (settings.isLocalPrivateLanMode) "LAN: ${settings.localEsp32Ip}" else "MQTT: ${settings.mqttBrokerUrl}",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary,
+                                maxLines = 1,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text = "Live • Sync",
+                                fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = SolarHeroText.copy(alpha = 0.8f)
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = "Updated: Just Now",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary.copy(alpha = 0.8f)
+                                color = SolarCyan
                             )
                         }
                     }
@@ -305,170 +316,31 @@ fun SolarHomeView(
             RealtimeEnergyFlowCard(
                 metrics = metrics,
                 accentColor = accentColor,
+                batteryType = settings.batteryTypeSelected,
+                onSelectBatteryType = { newType ->
+                    viewModel.saveSettings(settings.copy(batteryTypeSelected = newType))
+                },
                 onToggleSolar = { viewModel.toggleSolarPower() },
                 onToggleBattery = { viewModel.toggleBatteryCharging() },
                 onToggleGrid = { viewModel.toggleGridPower() }
             )
         }
 
-        // Customer Unit Binding & Manufacturer Support Card for DSP/IPS Global Monitoring
+        // Smart Inverter Operational Priority Mode Selector (SBU / SUB / USB)
         item {
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = SolarCardBg),
-                border = CardBorder(SolarBorder),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.CloudQueue,
-                                contentDescription = "Global Connection",
-                                tint = accentColor,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "IPS Device IoT Gateway",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .background(accentColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
-                                .border(1.dp, accentColor.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "GLOBAL LIVE",
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = accentColor
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Serial Number / Model Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                text = "Device Serial ID",
-                                fontSize = 10.sp,
-                                color = TextSecondary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = settings.deviceSerialNumber,
-                                fontSize = 14.sp,
-                                color = TextPrimary,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        }
-
-                        Column(horizontalAlignment = Alignment.End) {
-                            Text(
-                                text = "System Capacity",
-                                fontSize = 10.sp,
-                                color = TextSecondary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "${settings.ipsOutputRatingVa} VA Rating",
-                                fontSize = 14.sp,
-                                color = TextPrimary,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider(color = SolarBorder, thickness = 0.8.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Manufacturer Details & Quick Helpline Action
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Build,
-                                    contentDescription = null,
-                                    tint = TextSecondary,
-                                    modifier = Modifier.size(12.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = "Built & Installed By",
-                                    fontSize = 9.sp,
-                                    color = TextSecondary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Text(
-                                text = settings.installerName,
-                                fontSize = 12.sp,
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        // Support Phone helpline trigger
-                        Button(
-                            onClick = { /* Simulated helpline trigger */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.height(32.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Phone,
-                                contentDescription = "Call support",
-                                tint = Color.Black,
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Helpline",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                        }
-                    }
-                }
-            }
+            InverterOperationalModeCard(
+                currentMode = metrics.operationalMode,
+                onSelectMode = { newMode -> viewModel.setOperationalMode(newMode) },
+                accentColor = accentColor
+            )
         }
 
-        // Live Interactive Flow Diagram
-        if (settings.isFlowDiagramVisible) {
-            item {
-                Text(
-                    text = "System Power Flow Model",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = TextSecondary,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                LiveFlowDiagramCard(metrics = metrics, accentColor = accentColor, settings = settings)
-            }
+        // Daily Energy Yield, Financial Savings & Solar Irradiance Analytics (75way Solar Monitoring Architecture)
+        item {
+            EnergyAnalyticsSavingsCard(
+                metrics = metrics,
+                accentColor = accentColor
+            )
         }
 
         // Controls (Direct Control Actions)
@@ -623,10 +495,74 @@ fun SolarHomeView(
                             Text(lastSyncTime, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = SolarGreen)
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("WIFI 6 (802.11ax) SIGNAL", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                            Text("-58 dBm (Excellent)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                            Text("SYSTEM HEALTH SCORE", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Text("${metrics.systemHealthScore}% Operational", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (metrics.systemHealthScore > 85) SolarGreen else SolarGold)
                         }
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // ESP32-C6 Pin Telemetry Chips
+                    Text(
+                        text = "ACTIVE ESP32-C6 SENSOR BUS & PIN STATUS",
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(SolarCardElevated, RoundedCornerShape(6.dp))
+                                .border(0.6.dp, SolarBorder, RoundedCornerShape(6.dp))
+                                .padding(4.dp)
+                        ) {
+                            Column {
+                                Text("GPIO 1 (ADC1)", fontSize = 7.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text("ACS712 Current", fontSize = 8.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(SolarCardElevated, RoundedCornerShape(6.dp))
+                                .border(0.6.dp, SolarBorder, RoundedCornerShape(6.dp))
+                                .padding(4.dp)
+                        ) {
+                            Column {
+                                Text("GPIO 2 (ADC2)", fontSize = 7.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text("0-25V Sensor", fontSize = 8.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(SolarCardElevated, RoundedCornerShape(6.dp))
+                                .border(0.6.dp, SolarBorder, RoundedCornerShape(6.dp))
+                                .padding(4.dp)
+                        ) {
+                            Column {
+                                Text("GPIO 18 (1-Wire)", fontSize = 7.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text("${metrics.batteryTemp}°C DS18B20", fontSize = 8.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .weight(1.2f)
+                                .background(SolarCardElevated, RoundedCornerShape(6.dp))
+                                .border(0.6.dp, SolarBorder, RoundedCornerShape(6.dp))
+                                .padding(4.dp)
+                        ) {
+                            Column {
+                                Text("GPIO 6/7 (I2C)", fontSize = 7.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
+                                Text("${metrics.ambientLux} Lux BH1750", fontSize = 8.sp, color = SolarGold, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -637,8 +573,8 @@ fun SolarHomeView(
                             Text("${settings.mqttTopicPrefix}/metrics", fontSize = 10.sp, color = TextPrimary, fontWeight = FontWeight.Medium)
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("BROKER PORT", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
-                            Text("${settings.mqttPort} (Standard TCP)", fontSize = 10.sp, color = TextPrimary, fontWeight = FontWeight.Medium)
+                            Text("WIFI 6 (802.11ax)", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                            Text("-58 dBm (TWT Active)", fontSize = 10.sp, color = TextPrimary, fontWeight = FontWeight.Medium)
                         }
                     }
 
@@ -910,9 +846,11 @@ fun LiveFlowDiagramCard(
 
             // 1. PV SOLAR PRODUCTION NODE (Top Left)
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (metrics.isSolarOn) Color(0xFF14141E) else SolarCardBg
+                ),
                 shape = RoundedCornerShape(16.dp),
-                border = CardBorder(if (metrics.isSolarOn) SolarGold.copy(alpha = 0.5f) else SolarBorder),
+                border = CardBorder(if (metrics.isSolarOn) SolarGold.copy(alpha = 0.6f) else SolarBorder),
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .size(cardW, cardH)
@@ -942,7 +880,7 @@ fun LiveFlowDiagramCard(
                         fontWeight = FontWeight.Bold,
                         color = TextSecondary
                     )
-                    Text("DC Solar Input", fontSize = 7.sp, color = TextSecondary)
+                    Text("DC Solar Input", fontSize = 7.sp, color = TextMuted)
                 }
             }
 
@@ -953,9 +891,11 @@ fun LiveFlowDiagramCard(
             val gridCurrent = metrics.gridCurrent
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isGridActive) Color(0xFF101814) else SolarCardBg
+                ),
                 shape = RoundedCornerShape(16.dp),
-                border = CardBorder(if (isGridActive) SolarGreen.copy(alpha = 0.5f) else SolarBorder),
+                border = CardBorder(if (isGridActive) SolarGreen.copy(alpha = 0.6f) else SolarBorder),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .size(cardW, cardH)
@@ -971,7 +911,7 @@ fun LiveFlowDiagramCard(
                         Icon(
                             imageVector = if (metrics.isGridOn) Icons.Default.Power else Icons.Default.PowerOff,
                             contentDescription = null,
-                            tint = if (metrics.isGridOn) SolarGreen else Color.Gray,
+                            tint = if (metrics.isGridOn) SolarGreen else TextMuted,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -982,7 +922,7 @@ fun LiveFlowDiagramCard(
                         text = "${gridPower.toInt()} W",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (metrics.isGridOn) SolarGreen else Color.Gray
+                        color = if (metrics.isGridOn) SolarGreen else TextSecondary
                     )
                     Text(
                         text = if (metrics.isGridOn) "${gridVoltage.toInt()}V • ${String.format("%.2f", gridCurrent)}A" else "0V • 0.00A",
@@ -1004,10 +944,10 @@ fun LiveFlowDiagramCard(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(80.dp)
-                    .background(Color.White, RoundedCornerShape(20.dp))
+                    .background(Color(0xFF13131A), RoundedCornerShape(20.dp))
                     .border(
-                        width = 2.dp,
-                        brush = Brush.linearGradient(listOf(accentColor, SolarHeroBg)),
+                        width = 1.5.dp,
+                        brush = Brush.linearGradient(listOf(accentColor, SolarBorderGlow)),
                         shape = RoundedCornerShape(20.dp)
                     ),
                 contentAlignment = Alignment.Center
@@ -1032,14 +972,14 @@ fun LiveFlowDiagramCard(
                         text = if (metrics.isSolarOn) "Smart" else "Standby",
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (metrics.isSolarOn) Color(0xFF2E7D32) else Color.Gray
+                        color = if (metrics.isSolarOn) SolarGreen else TextSecondary
                     )
                 }
             }
 
             // 4. BATTERY GRAPHIC LIQUID CELL NODE (Bottom Left)
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = SolarCardBg),
                 shape = RoundedCornerShape(18.dp),
                 border = CardBorder(if (metrics.batteryVoltage < 11.5f) SolarRed else SolarBorder),
                 modifier = Modifier
@@ -1057,7 +997,7 @@ fun LiveFlowDiagramCard(
                         text = settings.batteryTypeSelected,
                         fontSize = 8.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF00ACC1),
+                        color = Color(0xFF00E5FF),
                         maxLines = 1,
                         modifier = Modifier.padding(bottom = 2.dp)
                     )
@@ -1068,8 +1008,8 @@ fun LiveFlowDiagramCard(
                         modifier = Modifier
                             .size(cardW - 32.dp, 50.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFE3F2FD))
-                            .border(1.dp, Color(0xFF90CAF9), RoundedCornerShape(8.dp)),
+                            .background(Color(0xFF0A121D))
+                            .border(1.dp, Color(0xFF1B324D), RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -1108,13 +1048,13 @@ fun LiveFlowDiagramCard(
                                 text = "${metrics.batteryPct}%",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = if (metrics.batteryPct < 55) TextPrimary else Color.White
+                                color = TextPrimary
                             )
                             Text(
                                 text = "${String.format("%.1f", metrics.batteryVoltage)}V",
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (metrics.batteryPct < 55) TextSecondary else Color.White.copy(alpha = 0.8f)
+                                color = SolarCyan
                             )
                         }
                     }
@@ -1143,9 +1083,11 @@ fun LiveFlowDiagramCard(
 
             // 5. AC LOAD APPLIANCE OUTLETS NODE (Bottom Right)
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (metrics.isLoadOn) Color(0xFF1E1214) else SolarCardBg
+                ),
                 shape = RoundedCornerShape(16.dp),
-                border = CardBorder(if (metrics.isLoadOn) SolarRed.copy(alpha = 0.5f) else SolarBorder),
+                border = CardBorder(if (metrics.isLoadOn) SolarRed.copy(alpha = 0.6f) else SolarBorder),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .size(cardW, cardH)
@@ -1175,7 +1117,7 @@ fun LiveFlowDiagramCard(
                         fontWeight = FontWeight.Bold,
                         color = TextSecondary
                     )
-                    Text("Total Load", fontSize = 7.sp, color = TextSecondary)
+                    Text("Total Load", fontSize = 7.sp, color = TextMuted)
                 }
             }
 
@@ -1186,9 +1128,9 @@ fun LiveFlowDiagramCard(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .offset(x = (-38).dp, y = 45.dp)
-                        .background(Color.White, RoundedCornerShape(4.dp))
-                        .border(1.dp, SolarGold.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .background(Color(0xFF121218), RoundedCornerShape(6.dp))
+                        .border(1.dp, SolarGold.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "Input ${metrics.panelPower.toInt()}W • ${metrics.panelCurrent}A",
@@ -1205,9 +1147,9 @@ fun LiveFlowDiagramCard(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .offset(x = 38.dp, y = (-42).dp)
-                        .background(Color.White, RoundedCornerShape(4.dp))
-                        .border(1.dp, SolarRed.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .background(Color(0xFF121218), RoundedCornerShape(6.dp))
+                        .border(1.dp, SolarRed.copy(alpha = 0.5f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "Output ${metrics.loadPower.toInt()}W • ${metrics.loadCurrent}A",
@@ -1234,8 +1176,10 @@ fun ControlButton(
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = CardBorder(if (isOn) activeColor.copy(alpha = 0.4f) else SolarBorder),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isOn) activeColor.copy(alpha = 0.08f) else SolarCardBg
+        ),
+        border = CardBorder(if (isOn) activeColor.copy(alpha = 0.5f) else SolarBorder),
         modifier = Modifier
             .width(105.dp)
             .clickable { onClick() }
@@ -1264,12 +1208,12 @@ fun ControlButton(
                 modifier = Modifier
                     .size(36.dp)
                     .background(
-                        color = if (isOn) activeColor.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.1f),
+                        color = if (isOn) activeColor.copy(alpha = 0.18f) else Color(0xFF1C1C24),
                         shape = CircleShape
                     )
                     .border(
                         width = 1.5.dp,
-                        color = if (isOn) activeColor else Color.Gray.copy(alpha = 0.4f),
+                        color = if (isOn) activeColor else Color(0xFF2E2E3C),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -1277,7 +1221,7 @@ fun ControlButton(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = if (isOn) activeColor else Color.Gray,
+                    tint = if (isOn) activeColor else Color(0xFF757588),
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -1306,7 +1250,7 @@ fun SolarDetailsCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Solar Power: ${if (metrics.isSolarOn) "ON" else "OFF"}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextPrimary)
                 }
-                Text("Battery Charging: ${if (metrics.isChargingOn && metrics.isSolarOn) "ON" else "OFF"}", style = MaterialTheme.typography.bodySmall, color = if (metrics.isChargingOn && metrics.isSolarOn) SolarGreen else Color.Gray, fontWeight = FontWeight.Bold)
+                Text("Battery Charging: ${if (metrics.isChargingOn && metrics.isSolarOn) "ON" else "OFF"}", style = MaterialTheme.typography.bodySmall, color = if (metrics.isChargingOn && metrics.isSolarOn) SolarGreen else TextSecondary, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -1804,8 +1748,8 @@ fun LivePowerBalanceDialGauge(
 
     Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.03f)),
-        border = BorderStroke(1.dp, SolarBorder.copy(alpha = 0.5f)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0C0C12)),
+        border = BorderStroke(1.dp, Color(0xFF1E1E28)),
         modifier = modifier
             .fillMaxWidth()
             .height(180.dp)
@@ -1830,7 +1774,7 @@ fun LivePowerBalanceDialGauge(
 
                     // 1. Draw background neutral tracks
                     drawCircle(
-                        color = Color.Gray.copy(alpha = 0.1f),
+                        color = Color(0xFF1C1C26),
                         radius = radius,
                         center = centerOffset,
                         style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidthValue)
@@ -1856,7 +1800,7 @@ fun LivePowerBalanceDialGauge(
                     val loadRatio = (metrics.loadPower / 1500f).coerceIn(0f, 1f)
                     val loadSweepAngle = loadRatio * 180f
                     drawArc(
-                        color = SolarRed,
+                        color = SolarOrange,
                         startAngle = 360f,
                         sweepAngle = -loadSweepAngle,
                         useCenter = false,
@@ -1915,7 +1859,7 @@ fun LivePowerBalanceDialGauge(
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(8.dp).background(SolarRed, CircleShape))
+                    Box(modifier = Modifier.size(8.dp).background(SolarOrange, CircleShape))
                     Spacer(modifier = Modifier.width(6.dp))
                     Column {
                         Text("Grid Load", fontSize = 8.sp, color = TextSecondary)
@@ -1929,6 +1873,283 @@ fun LivePowerBalanceDialGauge(
                     Column {
                         Text("Battery Pct", fontSize = 8.sp, color = TextSecondary)
                         Text("${metrics.batteryPct}% (${metrics.batteryVoltage} V)", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InverterOperationalModeCard(
+    currentMode: String,
+    onSelectMode: (String) -> Unit,
+    accentColor: Color
+) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+        border = BorderStroke(1.dp, SolarBorder),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Tune,
+                        contentDescription = "Operating Mode",
+                        tint = accentColor,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Inverter Priority Mode",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .background(accentColor.copy(alpha = 0.12f), RoundedCornerShape(6.dp))
+                        .border(1.dp, accentColor.copy(alpha = 0.35f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "ACTIVE: $currentMode",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = accentColor
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 3 Mode selection pills
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(
+                    Triple("SBU", "Solar Priority", "Max Savings"),
+                    Triple("SUB", "Solar-Grid", "Backup Reserve"),
+                    Triple("USB", "Utility Priority", "Standard UPS")
+                ).forEach { (modeCode, title, badge) ->
+                    val isSelected = currentMode == modeCode
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (isSelected) accentColor.copy(alpha = 0.15f) else SolarCardElevated
+                            )
+                            .border(
+                                width = if (isSelected) 1.5.dp else 0.8.dp,
+                                color = if (isSelected) accentColor else SolarBorder,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .clickable { onSelectMode(modeCode) }
+                            .padding(vertical = 10.dp, horizontal = 6.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = modeCode,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isSelected) accentColor else TextPrimary
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = title,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) TextPrimary else TextSecondary,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = badge,
+                                fontSize = 8.sp,
+                                color = if (isSelected) accentColor else TextSecondary.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            val description = when (currentMode) {
+                "SBU" -> "Solar > Battery > Utility. Solar powers loads first, battery discharges during deficit. Minimizes utility electricity bills."
+                "SUB" -> "Solar > Utility > Battery. Solar powers loads first, grid supplies deficit. Battery kept fully charged for load-shedding events."
+                "USB" -> "Utility > Solar > Battery. AC Grid supplies home load directly. Solar charges battery to 100% float standby."
+                else -> "Custom priority mode active."
+            }
+            Text(
+                text = description,
+                fontSize = 10.sp,
+                color = TextSecondary,
+                lineHeight = 14.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun EnergyAnalyticsSavingsCard(
+    metrics: SolarMetrics,
+    accentColor: Color
+) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+        border = BorderStroke(1.dp, SolarBorder),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Analytics,
+                        contentDescription = "Energy Analytics",
+                        tint = SolarGold,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Energy Yield & Financial Savings",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .background(SolarGreen.copy(alpha = 0.12f), RoundedCornerShape(6.dp))
+                        .border(1.dp, SolarGreen.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "PR: ${metrics.performanceRatioPct}% Optimal",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SolarGreen
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Primary 2-Column: Daily Generation vs Consumption
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Today Yield
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(SolarGold.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
+                        .border(1.dp, SolarGold.copy(alpha = 0.3f), RoundedCornerShape(14.dp))
+                        .padding(12.dp)
+                ) {
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.WbSunny, contentDescription = null, tint = SolarGold, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("SOLAR GENERATED", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("${metrics.dailyYieldKwh} kWh", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text("Target: 5.0 kWh daily", fontSize = 9.sp, color = TextSecondary)
+                    }
+                }
+
+                // Today Consumption
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(SolarRed.copy(alpha = 0.08f), RoundedCornerShape(14.dp))
+                        .border(1.dp, SolarRed.copy(alpha = 0.3f), RoundedCornerShape(14.dp))
+                        .padding(12.dp)
+                ) {
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Bolt, contentDescription = null, tint = SolarRed, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("LOAD CONSUMED", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("${metrics.dailyConsumptionKwh} kWh", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextPrimary)
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text("Self-Sufficiency: 88%", fontSize = 9.sp, color = SolarGreen, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 3-Metric Bottom Row: Money Saved, Carbon Offset, Solar Irradiance
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Cost Savings
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(SolarCardElevated, RoundedCornerShape(10.dp))
+                        .border(0.8.dp, SolarBorder, RoundedCornerShape(10.dp))
+                        .padding(8.dp)
+                ) {
+                    Column {
+                        Text("TODAY'S SAVINGS", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("৳${metrics.costSavingsBdt} BDT", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = SolarGreen)
+                        Text("@ ৳8.50 / kWh", fontSize = 8.sp, color = TextSecondary)
+                    }
+                }
+
+                // Carbon Offset
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(SolarCardElevated, RoundedCornerShape(10.dp))
+                        .border(0.8.dp, SolarBorder, RoundedCornerShape(10.dp))
+                        .padding(8.dp)
+                ) {
+                    Column {
+                        Text("CO₂ AVOIDED", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("${metrics.co2SavedKg} kg", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = SolarCyan)
+                        Text("Clean Solar Offset", fontSize = 8.sp, color = TextSecondary)
+                    }
+                }
+
+                // Ambient Light & Irradiance (BH1750 Sensor)
+                Box(
+                    modifier = Modifier
+                        .weight(1.2f)
+                        .background(SolarCardElevated, RoundedCornerShape(10.dp))
+                        .border(0.8.dp, SolarBorder, RoundedCornerShape(10.dp))
+                        .padding(8.dp)
+                ) {
+                    Column {
+                        Text("BH1750 LUX (GPIO 6/7)", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("${metrics.ambientLux} Lux", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = SolarGold)
+                        Text("${metrics.solarIrradianceWm2} W/m² (Peak: ${metrics.peakSunHours}h)", fontSize = 8.sp, color = TextSecondary)
                     }
                 }
             }
