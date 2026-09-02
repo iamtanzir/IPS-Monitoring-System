@@ -75,6 +75,9 @@ fun SolarSettingsView(
             modifier = Modifier.padding(top = 16.dp)
         )
 
+        // Collapsible Help & ESP32 Pairing Guide
+        HelpPairingGuideCard()
+
         // 1. Theme Color Selector Card
         Card(
             colors = CardDefaults.cardColors(containerColor = SolarCardBg),
@@ -565,7 +568,7 @@ fun SolarSettingsView(
                 }
 
                 VisibilityToggleRow(
-                    label = "Show Battery Cell Voltages Status",
+                    label = "Show Terminal Connection Diagnostics",
                     isChecked = settings.isCellVoltagesVisible
                 ) {
                     viewModel.saveSettings(settings.copy(isCellVoltagesVisible = !settings.isCellVoltagesVisible))
@@ -751,6 +754,26 @@ fun SolarSettingsView(
                     valueRange = 10.5f..12.2f, // Accurate low voltage cutoff parameters
                     colors = SliderDefaults.colors(thumbColor = SolarRed, activeTrackColor = SolarRed)
                 )
+
+                // Precise Input Threshold text editor
+                OutlinedTextField(
+                    value = if (limitLowBattery == 0f) "" else String.format("%.2f", limitLowBattery),
+                    onValueChange = { newValue ->
+                        val parsed = newValue.toFloatOrNull()
+                        if (parsed != null && parsed >= 10.0f && parsed <= 13.0f) {
+                            limitLowBattery = parsed
+                            viewModel.saveSettings(settings.copy(lowBatteryAlertLimit = parsed))
+                        }
+                    },
+                    label = { Text("Exact Low Voltage Threshold Input (V)", color = TextSecondary) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary,
+                        focusedBorderColor = SolarRed,
+                        unfocusedBorderColor = SolarBorder
+                    ),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
             }
         }
     }
@@ -803,5 +826,144 @@ fun VisibilityToggleRow(
                 checkmarkColor = Color.White
             )
         )
+    }
+}
+
+@Composable
+fun HelpPairingGuideCard() {
+    var isExpanded by remember { mutableStateOf(false) }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = SolarCardBg),
+        border = CardBorder(SolarCyan.copy(alpha = 0.6f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isExpanded = !isExpanded },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.HelpOutline,
+                        contentDescription = "Help Guide",
+                        tint = SolarCyan,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = "ESP32 Pairing & Connection Guide",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                        Text(
+                            text = "How to connect your ESP32 Solar System",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextSecondary,
+                            fontSize = 10.sp
+                        )
+                    }
+                }
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = "Toggle Expand",
+                    tint = TextSecondary
+                )
+            }
+
+            if (isExpanded) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider(color = SolarBorder.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                GuideStepItem(
+                    step = "1",
+                    title = "Enable Bluetooth (BLE)",
+                    desc = "Turn on Bluetooth on your smartphone. The ESP32 broadcasts a BLE signal with the name starting with 'ESP32_HYBRID_IPS_...' when it is ready to pair."
+                )
+
+                GuideStepItem(
+                    step = "2",
+                    title = "Scan & Find Dev",
+                    desc = "Go to 'ESP32 DevKit V1' section in the settings tab below. Click on 'Rescan BLE Gateways'. Locate your serial ID and click on 'PAIR & CONFIG'."
+                )
+
+                GuideStepItem(
+                    step = "3",
+                    title = "Configure Local Wi-Fi",
+                    desc = "Enter your local home router Wi-Fi SSID and Password. The app securely transfers these credentials via an encrypted Bluetooth handshake."
+                )
+
+                GuideStepItem(
+                    step = "4",
+                    title = "Confirm MQTT Telemetry",
+                    desc = "Once the ESP32 logs into Wi-Fi, it connects to HiveMQ Cloud. The main dashboard connection status will turn to 'MQTT ONLINE' and stream live metrics!"
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(SolarCyan.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
+                        .border(1.dp, SolarCyan.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                ) {
+                    Text(
+                        text = "💡 Pro Tip: Ensure your Wi-Fi is 2.4GHz. The ESP32 does not support 5GHz dual-band router bands.",
+                        fontSize = 11.sp,
+                        color = SolarCyan,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun GuideStepItem(
+    step: String,
+    title: String,
+    desc: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .background(SolarCyan, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = step,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = desc,
+                fontSize = 11.sp,
+                color = TextSecondary,
+                lineHeight = 15.sp
+            )
+        }
     }
 }

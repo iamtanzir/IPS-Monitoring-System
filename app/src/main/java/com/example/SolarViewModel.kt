@@ -13,7 +13,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.roundToInt
+
+// Notification data class
+data class SystemNotification(
+    val id: String,
+    val title: String,
+    val message: String,
+    val timestamp: String,
+    val severity: String // "info", "warning", "critical"
+)
 
 // Data classes for Solar metrics
 data class SolarMetrics(
@@ -113,6 +125,26 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
     // Current metrics flow
     private val _metrics = MutableStateFlow(SolarMetrics())
     val metrics: StateFlow<SolarMetrics> = _metrics.asStateFlow()
+
+    // Notifications StateFlow
+    private val _notifications = MutableStateFlow<List<SystemNotification>>(emptyList())
+    val notifications: StateFlow<List<SystemNotification>> = _notifications.asStateFlow()
+
+    // Last Sync timestamp
+    private val _lastSyncTime = MutableStateFlow(SimpleDateFormat("hh:mm:ss a", Locale.getDefault()).format(Date()))
+    val lastSyncTime: StateFlow<String> = _lastSyncTime.asStateFlow()
+
+    fun triggerNotification(title: String, message: String, severity: String) {
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val timeStr = sdf.format(Date())
+        val id = System.currentTimeMillis().toString()
+        val newNotif = SystemNotification(id, title, message, timeStr, severity)
+        _notifications.value = listOf(newNotif) + _notifications.value.take(29) // Keep last 30
+    }
+
+    fun dismissNotification(id: String) {
+        _notifications.value = _notifications.value.filter { it.id != id }
+    }
 
     // IoT Pairing variables
     private val _isPaired = MutableStateFlow(prefs.getBoolean("is_paired", true)) // Default to true so existing demo works out-of-the-box
@@ -277,6 +309,9 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
                 kotlinx.coroutines.delay(2500)
                 val current = _metrics.value
                 
+                // Update last successful ESP32 data sync timestamp
+                _lastSyncTime.value = SimpleDateFormat("hh:mm:ss a", Locale.getDefault()).format(Date())
+
                 // Slightly fluctuate parameters if not tripped
                 if (!current.isAutoCutTripped) {
                     val voltShift = ((-2..2).random() * 0.1f)
@@ -297,6 +332,19 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
                         batteryVoltage = newBatteryVolt
                     )
                     updateMetrics(updated)
+
+                    // Check for low battery threshold to trigger Material3 alert system
+                    if (newBatteryVolt < _settings.value.lowBatteryAlertLimit) {
+                        val activeAlerts = _notifications.value
+                        val hasLowBatteryAlert = activeAlerts.any { it.title.contains("Low Battery", ignoreCase = true) }
+                        if (!hasLowBatteryAlert) {
+                            triggerNotification(
+                                title = "⚠️ Low Battery Alert",
+                                message = "Battery voltage has dropped to ${newBatteryVolt}V, below your custom alert limit of ${_settings.value.lowBatteryAlertLimit}V. Connect charger immediately.",
+                                severity = "critical"
+                            )
+                        }
+                    }
                 }
             }
         }
