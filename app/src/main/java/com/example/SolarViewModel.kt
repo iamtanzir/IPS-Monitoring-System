@@ -353,7 +353,11 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadSettings() {
-        val customSolarName = prefs.getString("solar_name", "Universal IPS & Solar System") ?: "Universal IPS & Solar System"
+        var customSolarName = prefs.getString("solar_name", "Universal IPS & Solar System") ?: "Universal IPS & Solar System"
+        if (customSolarName.contains("Mehedy", ignoreCase = true) || customSolarName.contains("Hasan", ignoreCase = true)) {
+            customSolarName = "Universal IPS & Solar System"
+            prefs.edit().putString("solar_name", customSolarName).apply()
+        }
         val selectedAccentHex = prefs.getString("accent_hex", "#00E5FF") ?: "#00E5FF"
         val isCellVoltagesVisible = prefs.getBoolean("is_cell_visible", true)
         val isFlowDiagramVisible = prefs.getBoolean("is_flow_visible", true)
@@ -366,7 +370,11 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
         
         val mqttBroker = prefs.getString("mqtt_broker", "broker.hivemq.com") ?: "broker.hivemq.com"
         val mqttPort = prefs.getInt("mqtt_port", 1883)
-        val mqttPrefix = prefs.getString("mqtt_prefix", "smart/solar/solar01") ?: "smart/solar/solar01"
+        var mqttPrefix = prefs.getString("mqtt_prefix", "smart/solar/solar01") ?: "smart/solar/solar01"
+        if (mqttPrefix.contains("mehedy", ignoreCase = true)) {
+            mqttPrefix = "smart/solar/solar01"
+            prefs.edit().putString("mqtt_prefix", mqttPrefix).apply()
+        }
         val mqttClient = prefs.getString("mqtt_client", "solar_monitor_mobile_01") ?: "solar_monitor_mobile_01"
 
         // DSP/IPS custom properties
