@@ -1,0 +1,68 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- PCB Board -->
+    <path
+        android:fillColor="#1A1C1E"
+        android:pathData="M35,20 H165 A8,8 0 0,1 173,28 V172 A8,8 0 0,1 165,180 H35 A8,8 0 0,1 27,172 V28 A8,8 0 0,1 35,20 Z" />
+    
+    <!-- Mounting Holes -->
+    <path android:fillColor="#2C3036" android:pathData="M36,28 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#2C3036" android:pathData="M164,28 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#2C3036" android:pathData="M36,172 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#2C3036" android:pathData="M164,172 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+
+    <!-- Left Header Pins -->
+    <path
+        android:fillColor="#FFB300"
+        android:pathData="M30,38 h4 v4 h-4z M30,46 h4 v4 h-4z M30,54 h4 v4 h-4z M30,62 h4 v4 h-4z M30,70 h4 v4 h-4z M30,78 h4 v4 h-4z M30,86 h4 v4 h-4z M30,94 h4 v4 h-4z M30,102 h4 v4 h-4z M30,110 h4 v4 h-4z M30,118 h4 v4 h-4z M30,126 h4 v4 h-4z M30,134 h4 v4 h-4z M30,142 h4 v4 h-4z M30,150 h4 v4 h-4z" />
+    
+    <!-- Right Header Pins -->
+    <path
+        android:fillColor="#FFB300"
+        android:pathData="M166,38 h4 v4 h-4z M166,46 h4 v4 h-4z M166,54 h4 v4 h-4z M166,62 h4 v4 h-4z M166,70 h4 v4 h-4z M166,78 h4 v4 h-4z M166,86 h4 v4 h-4z M166,94 h4 v4 h-4z M166,102 h4 v4 h-4z M166,110 h4 v4 h-4z M166,118 h4 v4 h-4z M166,126 h4 v4 h-4z M166,134 h4 v4 h-4z M166,142 h4 v4 h-4z M166,150 h4 v4 h-4z" />
+
+    <!-- ESP-WROOM-32 Metal RF Shield -->
+    <path
+        android:fillColor="#C4C9D0"
+        android:pathData="M55,35 H145 A4,4 0 0,1 149,39 V105 A4,4 0 0,1 145,109 H55 A4,4 0 0,1 51,105 V39 A4,4 0 0,1 55,35 Z" />
+    <path
+        android:fillColor="#A2A9B2"
+        android:pathData="M53,37 H147 V42 H53 Z" />
+
+    <!-- PCB Antenna Area -->
+    <path
+        android:fillColor="#B78103"
+        android:pathData="M70,22 H130 V32 H70 Z" />
+    <path
+        android:fillColor="#E5A610"
+        android:strokeColor="#B78103"
+        android:strokeWidth="1"
+        android:pathData="M75,25 h6 v4 h4 v-4 h6 v4 h4 v-4 h6 v4 h4 v-4 h6 v4" />
+
+    <!-- Chip Text / Logo Simulation -->
+    <path
+        android:fillColor="#495057"
+        android:pathData="M65,55 H135 V58 H65 Z M65,63 H120 V65 H65 Z M65,70 H130 V72 H65 Z" />
+
+    <!-- Micro-USB Port -->
+    <path
+        android:fillColor="#DCE1E7"
+        android:pathData="M84,165 H116 A2,2 0 0,1 118,167 V182 A2,2 0 0,1 116,184 H84 A2,2 0 0,1 82,182 V167 A2,2 0 0,1 84,165 Z" />
+    <path
+        android:fillColor="#7B8491"
+        android:pathData="M88,171 H112 V177 H88 Z" />
+
+    <!-- EN and BOOT Buttons -->
+    <path android:fillColor="#495057" android:pathData="M48,155 H62 V165 H48 Z" />
+    <path android:fillColor="#DCE1E7" android:pathData="M52,158 H58 V162 H52 Z" />
+
+    <path android:fillColor="#495057" android:pathData="M138,155 H152 V165 H138 Z" />
+    <path android:fillColor="#DCE1E7" android:pathData="M142,158 H148 V162 H142 Z" />
+
+    <!-- Status LEDs -->
+    <path android:fillColor="#FF3D00" android:pathData="M70,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+    <path android:fillColor="#00E676" android:pathData="M130,140 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+</vector>

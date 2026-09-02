@@ -1,0 +1,63 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Stainless Steel Probe Cylinder -->
+    <path
+        android:fillColor="#CFD8DC"
+        android:pathData="M30,85 H95 A4,4 0 0,1 99,89 V111 A4,4 0 0,1 95,115 H30 A4,4 0 0,1 26,111 V89 A4,4 0 0,1 30,85 Z" />
+    <path
+        android:fillColor="#ECEFF1"
+        android:pathData="M26,90 H99 V96 H26 Z" />
+    <path
+        android:fillColor="#90A4AE"
+        android:pathData="M26,108 H99 V115 H26 Z" />
+
+    <!-- Heat Shrink Tubing / Rubber Collar -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M95,83 H120 V117 H95 Z" />
+
+    <!-- 3-Core Flexible Cable (Black jacket splitting into Red, Yellow/White, Black) -->
+    <path
+        android:strokeColor="#263238"
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:pathData="M120,100 C135,100 140,80 155,80" />
+
+    <!-- Split Wires -->
+    <!-- Red Wire: VCC (3.3V) -->
+    <path
+        android:strokeColor="#D32F2F"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M155,80 C165,80 170,60 185,60" />
+    <!-- Yellow Wire: DATA (D4 with 4.7k Pullup) -->
+    <path
+        android:strokeColor="#FBC02D"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M155,80 C165,80 170,100 185,100" />
+    <!-- Black Wire: GND -->
+    <path
+        android:strokeColor="#212121"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M155,80 C165,80 170,140 185,140" />
+
+    <!-- 4.7K Pull-Up Resistor badge -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M135,120 H170 A4,4 0 0,1 174,124 V136 A4,4 0 0,1 170,140 H135 A4,4 0 0,1 131,136 V124 A4,4 0 0,1 135,120 Z" />
+    <!-- Resistor Color bands (Yellow, Violet, Red, Gold) -->
+    <path android:fillColor="#FBC02D" android:pathData="M138,120 H142 V140 H138 Z" />
+    <path android:fillColor="#7B1FA2" android:pathData="M146,120 H150 V140 H146 Z" />
+    <path android:fillColor="#D32F2F" android:pathData="M154,120 H158 V140 H154 Z" />
+    <path android:fillColor="#FFD54F" android:pathData="M164,120 H168 V140 H164 Z" />
+
+    <!-- Temperature Icon badge -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M48,93 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 M50,93 v14 h-4 v-14" />
+</vector>

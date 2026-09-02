@@ -39,6 +39,11 @@ fun SolarHomeView(
     val accentColor = viewModel.getAccentColor()
     val notifications by viewModel.notifications.collectAsState()
     val lastSyncTime by viewModel.lastSyncTime.collectAsState()
+    var showBomDialog by remember { mutableStateOf(false) }
+
+    if (showBomDialog) {
+        HardwareBomDialog(onDismiss = { showBomDialog = false })
+    }
 
     LazyColumn(
         modifier = modifier
@@ -607,6 +612,26 @@ fun SolarHomeView(
                             Text("BROKER PORT", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
                             Text("${settings.mqttPort} (Standard TCP)", fontSize = 10.sp, color = TextPrimary, fontWeight = FontWeight.Medium)
                         }
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+                    OutlinedButton(
+                        onClick = { showBomDialog = true },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = SolarCyan.copy(alpha = 0.1f)
+                        ),
+                        border = BorderStroke(1.dp, SolarCyan.copy(alpha = 0.6f)),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Memory, contentDescription = null, tint = SolarCyan, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Hardware Component BOM & Circuit Diagram (ছবিসহ)",
+                            color = SolarCyan,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

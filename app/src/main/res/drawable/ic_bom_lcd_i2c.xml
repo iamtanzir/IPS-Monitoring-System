@@ -1,0 +1,47 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Green Main LCD PCB -->
+    <path
+        android:fillColor="#1B5E20"
+        android:pathData="M15,45 H185 A6,6 0 0,1 191,51 V149 A6,6 0 0,1 185,155 H15 A6,6 0 0,1 9,149 V51 A6,6 0 0,1 15,45 Z" />
+
+    <!-- Mounting Holes -->
+    <path android:fillColor="#2E7D32" android:pathData="M20,55 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#2E7D32" android:pathData="M180,55 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#2E7D32" android:pathData="M20,145 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#2E7D32" android:pathData="M180,145 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+
+    <!-- Metal LCD Bezel Frame (Black/Dark Slate) -->
+    <path
+        android:fillColor="#263238"
+        android:pathData="M30,60 H170 A4,4 0 0,1 174,64 V136 A4,4 0 0,1 170,140 H30 A4,4 0 0,1 26,136 V64 A4,4 0 0,1 30,60 Z" />
+
+    <!-- LCD Glass Display Area (Yellow-Green Backlight) -->
+    <path
+        android:fillColor="#CDDC39"
+        android:pathData="M38,70 H162 A2,2 0 0,1 164,72 V128 A2,2 0 0,1 162,130 H38 A2,2 0 0,1 36,128 V72 A2,2 0 0,1 38,70 Z" />
+
+    <!-- Dot Matrix Characters Line 1: "SOLAR: 28W 12.6V" -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M44,80 H50 V88 H44 Z M52,80 H58 V88 H52 Z M60,80 H66 V88 H60 Z M68,80 H74 V88 H68 Z M76,80 H82 V88 H76 Z M88,80 H94 V88 H88 Z M96,80 H102 V88 H96 Z M108,80 H114 V88 H108 Z M116,80 H122 V88 H116 Z M124,80 H130 V88 H124 Z M132,80 H138 V88 H132 Z M140,80 H146 V88 H140 Z" />
+
+    <!-- Dot Matrix Characters Line 2: "BAT:85% GRID:ON" -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M44,104 H50 V112 H44 Z M52,104 H58 V112 H52 Z M60,104 H66 V112 H60 Z M68,104 H74 V112 H68 Z M76,104 H82 V112 H76 Z M88,104 H94 V112 H88 Z M96,104 H102 V112 H96 Z M108,104 H114 V112 H108 Z M116,104 H122 V112 H116 Z M124,104 H130 V112 H124 Z M132,104 H138 V112 H132 Z M140,104 H146 V112 H140 Z" />
+
+    <!-- I2C Backpack Module attached on Right/Bottom (Black PCB with PCF8574) -->
+    <path
+        android:fillColor="#1A237E"
+        android:pathData="M140,140 H185 A3,3 0 0,1 188,143 V175 A3,3 0 0,1 185,178 H140 A3,3 0 0,1 137,175 V143 A3,3 0 0,1 140,140 Z" />
+    <!-- 4-Pin I2C Header (GND, VCC, SDA, SCL) -->
+    <path android:fillColor="#212121" android:pathData="M142,168 H182 V175 H142 Z" />
+    <path android:fillColor="#FFB300" android:pathData="M146,175 v12 h3 v-12z M156,175 v12 h3 v-12z M166,175 v12 h3 v-12z M176,175 v12 h3 v-12z" />
+    <!-- I2C Chip & Trimmer -->
+    <path android:fillColor="#212121" android:pathData="M145,146 H165 V158 H145 Z" />
+    <path android:fillColor="#00E5FF" android:pathData="M170,148 H180 V156 H170 Z" />
+</vector>

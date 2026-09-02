@@ -59,6 +59,11 @@ fun SolarSettingsView(
     var editedModbusAddr by remember(settings.dspModbusAddress) { mutableStateOf(settings.dspModbusAddress.toString()) }
     var editedVaRating by remember(settings.ipsOutputRatingVa) { mutableStateOf(settings.ipsOutputRatingVa.toString()) }
     var editedBatteryType by remember(settings.batteryTypeSelected) { mutableStateOf(settings.batteryTypeSelected) }
+    var showBomDialog by remember { mutableStateOf(false) }
+
+    if (showBomDialog) {
+        HardwareBomDialog(onDismiss = { showBomDialog = false })
+    }
 
     Column(
         modifier = modifier
@@ -734,6 +739,19 @@ fun SolarSettingsView(
                                 Text("Auto-Cut Over-Current", fontSize = 9.sp, color = TextSecondary, fontWeight = FontWeight.Bold)
                                 Text("${String.format("%.1f", settings.maxCurrentLimit)} A", fontSize = 13.sp, color = TextPrimary, fontWeight = FontWeight.Bold)
                             }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = { showBomDialog = true },
+                            colors = ButtonDefaults.outlinedButtonColors(containerColor = SolarCyan.copy(alpha = 0.1f)),
+                            border = BorderStroke(1.dp, SolarCyan.copy(alpha = 0.5f)),
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Memory, contentDescription = null, tint = SolarCyan, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("হার্ডওয়্যার কম্পোনেন্ট BOM ও সার্কিট ডায়াগ্রাম (ছবিসহ)", fontSize = 11.sp, color = SolarCyan, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

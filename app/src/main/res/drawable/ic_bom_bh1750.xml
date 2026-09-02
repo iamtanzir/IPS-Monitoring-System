@@ -1,0 +1,37 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Blue PCB -->
+    <path
+        android:fillColor="#0288D1"
+        android:pathData="M50,40 H150 A6,6 0 0,1 156,46 V154 A6,6 0 0,1 150,160 H50 A6,6 0 0,1 44,154 V46 A6,6 0 0,1 50,40 Z" />
+
+    <!-- Mounting Holes -->
+    <path android:fillColor="#01579B" android:pathData="M55,50 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#01579B" android:pathData="M145,50 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+
+    <!-- BH1750 Light Sensor IC in Center with Transparent Dome / Photodiode -->
+    <path
+        android:fillColor="#263238"
+        android:pathData="M80,80 H120 A4,4 0 0,1 124,84 V114 A4,4 0 0,1 120,118 H80 A4,4 0 0,1 76,114 V84 A4,4 0 0,1 80,80 Z" />
+    <!-- Optical Sensor Lens / Dome -->
+    <path android:fillColor="#81D4FA" android:pathData="M100,99 m-12,0 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0" />
+    <path android:fillColor="#E1F5FE" android:pathData="M100,99 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+    <path android:fillColor="#0288D1" android:pathData="M98,97 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+
+    <!-- Sun rays around sensor -->
+    <path
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M100,70 V62 M100,128 V136 M70,99 H62 M130,99 H138 M78,78 L72,72 M122,120 L128,126 M78,120 L72,126 M122,78 L128,72" />
+
+    <!-- 5-Pin Header on Bottom (VCC, GND, SCL, SDA, ADDR) -->
+    <path android:fillColor="#212121" android:pathData="M60,150 H140 V158 H60 Z" />
+    <path android:fillColor="#FFB300" android:pathData="M68,158 v16 h4 v-16z M83,158 v16 h4 v-16z M98,158 v16 h4 v-16z M113,158 v16 h4 v-16z M128,158 v16 h4 v-16z" />
+
+    <!-- Silkscreen text on PCB -->
+    <path android:fillColor="#FFFFFF" android:pathData="M84,54 H116 V58 H84 Z M88,64 H112 V67 H88 Z" />
+</vector>

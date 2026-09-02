@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Aluminum Frame -->
+    <path
+        android:fillColor="#CFD8DC"
+        android:pathData="M20,30 H180 A6,6 0 0,1 186,36 V164 A6,6 0 0,1 180,170 H20 A6,6 0 0,1 14,164 V36 A6,6 0 0,1 20,30 Z" />
+
+    <!-- Dark Blue Solar Glass Base -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M24,34 H176 V166 H24 Z" />
+
+    <!-- Grid of PV Polycrystalline/Monocrystalline Cells -->
+    <!-- Row 1 -->
+    <path android:fillColor="#1565C0" android:pathData="M27,37 H60 V75 H27 Z M64,37 H98 V75 H64 Z M102,37 H136 V75 H102 Z M140,37 H173 V75 H140 Z" />
+    <!-- Row 2 -->
+    <path android:fillColor="#1976D2" android:pathData="M27,79 H60 V121 H27 Z M64,79 H98 V121 H64 Z M102,79 H136 V121 H102 Z M140,79 H173 V121 H140 Z" />
+    <!-- Row 3 -->
+    <path android:fillColor="#1565C0" android:pathData="M27,125 H60 V163 H27 Z M64,125 H98 V163 H64 Z M102,125 H136 V163 H102 Z M140,125 H173 V163 H140 Z" />
+
+    <!-- Silver Busbars Lines -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.7"
+        android:strokeWidth="1.2"
+        android:pathData="M43,35 V165 M81,35 V165 M119,35 V165 M156,35 V165" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.3"
+        android:strokeWidth="0.8"
+        android:pathData="M24,56 H176 M24,100 H176 M24,144 H176" />
+
+    <!-- Sunlight reflection highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.15"
+        android:pathData="M30,34 L120,34 L80,166 L24,166 Z" />
+</vector>

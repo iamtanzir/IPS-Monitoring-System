@@ -5,11 +5,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,21 +32,91 @@ fun SolarSummaryView(
     modifier: Modifier = Modifier
 ) {
     val items = viewModel.historicalSummaries
+    var selectedTab by remember { mutableStateOf(0) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "SYSTEM SUMMARY",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = SolarCyan,
-            letterSpacing = 1.5.sp
-        )
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Tab Selector between System Analytics and Hardware BOM
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(SolarCardBg, RoundedCornerShape(12.dp))
+                .border(1.dp, SolarBorder, RoundedCornerShape(12.dp))
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (selectedTab == 0) SolarCyan else Color.Transparent)
+                    .clickable { selectedTab = 0 }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.Analytics,
+                        contentDescription = null,
+                        tint = if (selectedTab == 0) Color(0xFF0D1B2A) else TextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "System Summary",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (selectedTab == 0) Color(0xFF0D1B2A) else TextSecondary
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1.3f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (selectedTab == 1) SolarCyan else Color.Transparent)
+                    .clickable { selectedTab = 1 }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.Memory,
+                        contentDescription = null,
+                        tint = if (selectedTab == 1) Color(0xFF0D1B2A) else TextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Hardware BOM (ছবিসহ)",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (selectedTab == 1) Color(0xFF0D1B2A) else TextSecondary
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
+
+        if (selectedTab == 1) {
+            HardwareBomContent(modifier = Modifier.fillMaxSize())
+        } else {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    text = "SYSTEM SUMMARY",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = SolarCyan,
+                    letterSpacing = 1.5.sp
+                )
+                Spacer(modifier = Modifier.height(10.dp))
 
         // Table Header
         Card(
@@ -148,6 +223,8 @@ fun SolarSummaryView(
                 }
             }
         }
+        }
+    }
         Spacer(modifier = Modifier.height(16.dp))
     }
 }

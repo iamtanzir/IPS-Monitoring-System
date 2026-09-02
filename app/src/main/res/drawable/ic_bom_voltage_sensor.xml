@@ -1,0 +1,44 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Blue PCB -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M30,40 H170 A6,6 0 0,1 176,46 V154 A6,6 0 0,1 170,160 H30 A6,6 0 0,1 24,154 V46 A6,6 0 0,1 30,40 Z" />
+
+    <!-- 2-Pin Blue Screw Terminal on Left (GND, VCC < 25V) -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M34,60 H80 A4,4 0 0,1 84,64 V136 A4,4 0 0,1 80,140 H34 A4,4 0 0,1 30,136 V64 A4,4 0 0,1 34,60 Z" />
+    <!-- Screws -->
+    <path android:fillColor="#CFD8DC" android:pathData="M57,80 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+    <path android:fillColor="#37474F" android:pathData="M57,80 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#ECEFF1" android:pathData="M52,79 H62 V81 H52 Z" />
+
+    <path android:fillColor="#CFD8DC" android:pathData="M57,120 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+    <path android:fillColor="#37474F" android:pathData="M57,120 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#ECEFF1" android:pathData="M52,119 H62 V121 H52 Z" />
+
+    <!-- Precision Resistors (Voltage Divider 30K / 7.5K) -->
+    <path android:fillColor="#212121" android:pathData="M102,82 H124 V94 H102 Z" />
+    <path android:fillColor="#CFD8DC" android:pathData="M100,85 h2 v8 h-2z M124,85 h2 v8 h-2z" />
+    <!-- 30K / 7.5K resistor code -->
+    <path android:fillColor="#FFFFFF" android:pathData="M106,86 H120 V88 H106 Z M106,90 H116 V92 H106 Z" />
+
+    <path android:fillColor="#212121" android:pathData="M102,106 H124 V118 H102 Z" />
+    <path android:fillColor="#CFD8DC" android:pathData="M100,109 h2 v8 h-2z M124,109 h2 v8 h-2z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M106,110 H120 V112 H106 Z M106,114 H116 V116 H106 Z" />
+
+    <!-- 3-Pin Header on Right (S, +, -) -->
+    <path android:fillColor="#212121" android:pathData="M148,70 H156 V130 H148 Z" />
+    <path android:fillColor="#FFB300" android:pathData="M156,80 h12 v4 h-12z" />
+    <path android:fillColor="#FFB300" android:pathData="M156,100 h12 v4 h-12z" />
+    <path android:fillColor="#FFB300" android:pathData="M156,120 h12 v4 h-12z" />
+
+    <!-- Pin labels silkscreen -->
+    <path android:fillColor="#FFFFFF" android:pathData="M136,81 H144 V83 H136 Z M138,98 H142 V104 H138 Z M137,100 H143 V102 H137 Z M137,121 H143 V123 H137 Z" />
+    <!-- Module Silk Text "VCC < 25V" -->
+    <path android:fillColor="#90CAF9" android:pathData="M98,60 H136 V64 H98 Z M98,135 H136 V139 H98 Z" />
+</vector>

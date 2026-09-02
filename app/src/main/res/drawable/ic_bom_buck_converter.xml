@@ -1,0 +1,50 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Blue PCB -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M25,50 H175 A6,6 0 0,1 181,56 V144 A6,6 0 0,1 175,150 H25 A6,6 0 0,1 19,144 V56 A6,6 0 0,1 25,50 Z" />
+
+    <!-- Terminal Solder Pads (IN+, IN-, OUT+, OUT-) -->
+    <path android:fillColor="#FFC107" android:pathData="M24,65 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#FFC107" android:pathData="M24,135 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#FFC107" android:pathData="M176,65 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#FFC107" android:pathData="M176,135 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+
+    <!-- Electrolytic Filter Capacitor (Input) -->
+    <path android:fillColor="#263238" android:pathData="M48,100 m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0" />
+    <path android:fillColor="#78909C" android:pathData="M48,100 m-12,0 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0" />
+    <!-- Negative stripe -->
+    <path android:fillColor="#CFD8DC" android:pathData="M34,88 H38 V112 H34 Z" />
+
+    <!-- Power Inductor (Toroidal / Shielded 47uH / 33uH) -->
+    <path
+        android:fillColor="#37474F"
+        android:pathData="M76,76 H116 A4,4 0 0,1 120,80 V120 A4,4 0 0,1 116,124 H76 A4,4 0 0,1 72,120 V80 A4,4 0 0,1 76,76 Z" />
+    <path android:fillColor="#ECEFF1" android:pathData="M84,94 H108 V100 H84 Z M88,104 H104 V108 H88 Z" />
+
+    <!-- Multi-turn Precision Trimpot (Blue with Gold Screw) -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M128,70 H154 A3,3 0 0,1 157,73 V105 A3,3 0 0,1 154,108 H128 A3,3 0 0,1 125,105 V73 A3,3 0 0,1 128,70 Z" />
+    <!-- Brass Screw -->
+    <path android:fillColor="#FFD54F" android:pathData="M136,78 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#FFA000" android:pathData="M133,77 H139 V79 H133 Z" />
+
+    <!-- Output Electrolytic Capacitor -->
+    <path android:fillColor="#263238" android:pathData="M152,124 m-12,0 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0" />
+    <path android:fillColor="#78909C" android:pathData="M152,124 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+
+    <!-- LM2596 Regulator IC (TO-263) -->
+    <path android:fillColor="#212121" android:pathData="M75,60 H105 V72 H75 Z" />
+    <path android:fillColor="#B0BEC5" android:pathData="M78,57 H102 V60 H78 Z" />
+
+    <!-- Red Output Power LED -->
+    <path android:fillColor="#FF1744" android:pathData="M165,95 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+
+    <!-- 5V Text Silk -->
+    <path android:fillColor="#E3F2FD" android:pathData="M160,56 H172 V60 H160 Z M28,56 H40 V60 H28 Z" />
+</vector>

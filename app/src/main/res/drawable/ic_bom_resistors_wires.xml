@@ -1,0 +1,50 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Dupont Jumper Wires Bundle -->
+    <!-- Red Wire -->
+    <path
+        android:strokeColor="#E53935"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M30,50 C60,20 140,80 170,40" />
+    <path android:fillColor="#212121" android:pathData="M24,46 H32 V54 H24 Z M168,36 H176 V44 H168 Z" />
+
+    <!-- Yellow Wire -->
+    <path
+        android:strokeColor="#FDD835"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M30,80 C70,120 130,40 170,80" />
+    <path android:fillColor="#212121" android:pathData="M24,76 H32 V84 H24 Z M168,76 H176 V84 H168 Z" />
+
+    <!-- Blue Wire -->
+    <path
+        android:strokeColor="#1E88E5"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M30,110 C80,70 120,150 170,110" />
+    <path android:fillColor="#212121" android:pathData="M24,106 H32 V114 H24 Z M168,106 H176 V114 H168 Z" />
+
+    <!-- Resistor 1: 1kΩ (Brown, Black, Red, Gold) -->
+    <path android:strokeColor="#B0BEC5" android:strokeWidth="2" android:pathData="M30,150 H65 M115,150 H150" />
+    <path
+        android:fillColor="#CFD8DC"
+        android:pathData="M65,142 H115 A4,4 0 0,1 119,146 V154 A4,4 0 0,1 115,158 H65 A4,4 0 0,1 61,154 V146 A4,4 0 0,1 65,142 Z" />
+    <path android:fillColor="#6D4C41" android:pathData="M70,142 H75 V158 H70 Z" />
+    <path android:fillColor="#212121" android:pathData="M80,142 H85 V158 H80 Z" />
+    <path android:fillColor="#E53935" android:pathData="M90,142 H95 V158 H90 Z" />
+    <path android:fillColor="#FFD54F" android:pathData="M105,142 H110 V158 H105 Z" />
+
+    <!-- Resistor 2: 2kΩ (Red, Black, Red, Gold) -->
+    <path android:strokeColor="#B0BEC5" android:strokeWidth="2" android:pathData="M50,175 H85 M135,175 H170" />
+    <path
+        android:fillColor="#CFD8DC"
+        android:pathData="M85,167 H135 A4,4 0 0,1 139,171 V179 A4,4 0 0,1 135,183 H85 A4,4 0 0,1 81,179 V171 A4,4 0 0,1 85,167 Z" />
+    <path android:fillColor="#E53935" android:pathData="M90,167 H95 V183 H90 Z" />
+    <path android:fillColor="#212121" android:pathData="M100,167 H105 V183 H100 Z" />
+    <path android:fillColor="#E53935" android:pathData="M110,167 H115 V183 H110 Z" />
+    <path android:fillColor="#FFD54F" android:pathData="M125,167 H130 V183 H125 Z" />
+</vector>

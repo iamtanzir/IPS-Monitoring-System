@@ -1,0 +1,47 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Blue PCB -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M25,50 H175 A6,6 0 0,1 181,56 V144 A6,6 0 0,1 175,150 H25 A6,6 0 0,1 19,144 V56 A6,6 0 0,1 25,50 Z" />
+    
+    <!-- Screw Terminal Block (Green) on Left for Current Measurement -->
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M30,65 H75 A4,4 0 0,1 79,69 V131 A4,4 0 0,1 75,135 H30 A4,4 0 0,1 26,131 V69 A4,4 0 0,1 30,65 Z" />
+    <!-- Two Screw Holes -->
+    <path android:fillColor="#B0BEC5" android:pathData="M52,82 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+    <path android:fillColor="#263238" android:pathData="M52,82 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#ECEFF1" android:pathData="M48,81 H56 V83 H48 Z" />
+
+    <path android:fillColor="#B0BEC5" android:pathData="M52,118 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+    <path android:fillColor="#263238" android:pathData="M52,118 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#ECEFF1" android:pathData="M48,117 H56 V119 H48 Z" />
+
+    <!-- ACS712 SOIC-8 IC in Center -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M100,80 H135 A2,2 0 0,1 137,82 V118 A2,2 0 0,1 135,120 H100 A2,2 0 0,1 98,118 V82 A2,2 0 0,1 100,80 Z" />
+    <!-- IC Pins -->
+    <path android:fillColor="#CFD8DC" android:pathData="M93,85 h5 v3 h-5z M93,93 h5 v3 h-5z M93,101 h5 v3 h-5z M93,109 h5 v3 h-5z" />
+    <path android:fillColor="#CFD8DC" android:pathData="M137,85 h5 v3 h-5z M137,93 h5 v3 h-5z M137,101 h5 v3 h-5z M137,109 h5 v3 h-5z" />
+    <!-- IC Text Mark -->
+    <path android:fillColor="#FFFFFF" android:pathData="M106,96 H128 V98 H106 Z M106,102 H124 V104 H106 Z" />
+
+    <!-- SMD Resistors / Capacitors -->
+    <path android:fillColor="#78909C" android:pathData="M98,66 H108 V72 H98 Z M115,66 H125 V72 H115 Z" />
+    <!-- Power LED (Red) -->
+    <path android:fillColor="#FF1744" android:pathData="M142,68 m-3,0 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+
+    <!-- 3-Pin Header (Right: VCC, OUT, GND) -->
+    <path android:fillColor="#212121" android:pathData="M158,75 H166 V125 H158 Z" />
+    <path android:fillColor="#FFB300" android:pathData="M166,82 h10 v4 h-10z" />
+    <path android:fillColor="#FFB300" android:pathData="M166,98 h10 v4 h-10z" />
+    <path android:fillColor="#FFB300" android:pathData="M166,114 h10 v4 h-10z" />
+
+    <!-- Text Silk Screen -->
+    <path android:fillColor="#E3F2FD" android:pathData="M145,83 H154 V85 H145 Z M145,99 H154 V101 H145 Z M145,115 H154 V117 H145 Z" />
+</vector>

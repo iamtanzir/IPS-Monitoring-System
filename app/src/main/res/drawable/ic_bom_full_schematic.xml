@@ -1,0 +1,152 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="400dp"
+    android:height="240dp"
+    android:viewportWidth="400"
+    android:viewportHeight="240">
+
+    <!-- Dark Blueprint Background -->
+    <path
+        android:fillColor="#0A1118"
+        android:pathData="M0,0 H400 V240 H0 Z" />
+
+    <!-- Grid lines -->
+    <path
+        android:strokeColor="#1E293B"
+        android:strokeWidth="0.5"
+        android:pathData="M0,40 H400 M0,80 H400 M0,120 H400 M0,160 H400 M0,200 H400 M40,0 V240 M80,0 V240 M120,0 V240 M160,0 V240 M200,0 V240 M240,0 V240 M280,0 V240 M320,0 V240 M360,0 V240" />
+
+    <!-- 1. ESP32 Microcontroller (Center: x:160..240, y:15..165) -->
+    <path
+        android:fillColor="#1E232A"
+        android:pathData="M165,20 H235 A4,4 0 0,1 239,24 V160 A4,4 0 0,1 235,164 H165 A4,4 0 0,1 161,160 V24 A4,4 0 0,1 165,20 Z" />
+    <!-- ESP32 Shield & Antenna -->
+    <path android:fillColor="#94A3B8" android:pathData="M175,32 H225 V75 H175 Z" />
+    <path android:fillColor="#D97706" android:pathData="M182,22 H218 V30 H182 Z" />
+    <!-- Pin Labels & Headers -->
+    <path android:fillColor="#F59E0B" android:pathData="M160,35 h3 v80 h-3z M237,35 h3 v80 h-3z" />
+
+    <!-- 2. ACS712 Current Sensor (Top Left: x:20..110, y:30..80) -->
+    <path
+        android:fillColor="#1E40AF"
+        android:pathData="M25,35 H105 A3,3 0 0,1 108,38 V78 A3,3 0 0,1 105,81 H25 A3,3 0 0,1 22,78 V38 A3,3 0 0,1 25,35 Z" />
+    <path android:fillColor="#16A34A" android:pathData="M24,42 H45 V74 H24 Z" /> <!-- Screw Terminal -->
+    <path android:fillColor="#0F172A" android:pathData="M65,50 H85 V68 H65 Z" /> <!-- IC -->
+
+    <!-- Voltage Divider 1k/2k Box between ACS712 and D34 -->
+    <path
+        android:strokeColor="#EC4899"
+        android:strokeWidth="1"
+        android:fillColor="#831843"
+        android:fillAlpha="0.3"
+        android:pathData="M120,28 H152 V68 H120 Z" />
+
+    <!-- 3. DC Voltage Sensor Module (Mid Left: x:20..105, y:95..145) -->
+    <path
+        android:fillColor="#1D4ED8"
+        android:pathData="M25,100 H105 A3,3 0 0,1 108,103 V140 A3,3 0 0,1 105,143 H25 A3,3 0 0,1 22,140 V103 A3,3 0 0,1 25,100 Z" />
+    <path android:fillColor="#2563EB" android:pathData="M24,107 H45 V136 H24 Z" /> <!-- Blue Screw Terminal -->
+    <path android:fillColor="#0F172A" android:pathData="M62,112 H82 V130 H62 Z" /> <!-- Divider resistors -->
+
+    <!-- 4. Solar Panel (Bottom Left: x:15..115, y:160..225) -->
+    <path
+        android:fillColor="#0C4A6E"
+        android:strokeColor="#64748B"
+        android:strokeWidth="1.5"
+        android:pathData="M20,165 H110 V220 H20 Z" />
+    <path
+        android:strokeColor="#38BDF8"
+        android:strokeAlpha="0.6"
+        android:strokeWidth="0.8"
+        android:pathData="M42,165 V220 M65,165 V220 M88,165 V220 M20,183 H110 M20,202 H110" />
+
+    <!-- 5. 5V Power Supply / Buck (Bottom Center: x:155..205, y:185..230) -->
+    <path
+        android:fillColor="#DC2626"
+        android:pathData="M155,188 H205 A3,3 0 0,1 208,191 V225 A3,3 0 0,1 205,228 H155 A3,3 0 0,1 152,225 V191 A3,3 0 0,1 155,188 Z" />
+
+    <!-- 6. LCD Display with I2C (Top Right: x:290..385, y:20..105) -->
+    <path
+        android:fillColor="#15803D"
+        android:pathData="M295,25 H385 A3,3 0 0,1 388,28 V100 A3,3 0 0,1 385,103 H295 A3,3 0 0,1 292,100 V28 A3,3 0 0,1 295,25 Z" />
+    <!-- LCD Screen -->
+    <path android:fillColor="#84CC16" android:pathData="M305,35 H375 V85 H305 Z" />
+    <!-- LCD Text lines -->
+    <path android:fillColor="#1E293B" android:pathData="M310,45 H370 V52 H310 Z M310,65 H365 V72 H310 Z" />
+    <!-- I2C Backpack on LCD edge -->
+    <path android:fillColor="#0284C7" android:pathData="M285,45 H295 V80 H285 Z" />
+
+    <!-- 7. DS18B20 Temp Sensor (Mid Right: x:245..275, y:60..90) -->
+    <path android:fillColor="#334155" android:pathData="M250,60 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path android:fillColor="#94A3B8" android:pathData="M246,65 H254 V80 H246 Z" />
+    <!-- 4.7K Pullup resistor -->
+    <path android:fillColor="#EAB308" android:pathData="M258,82 H266 V96 H258 Z" />
+
+    <!-- 8. BH1750 Ambient Light Sensor (Bottom Right: x:280..340, y:150..215) -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M285,155 H335 A3,3 0 0,1 338,158 V210 A3,3 0 0,1 335,213 H285 A3,3 0 0,1 282,210 V158 A3,3 0 0,1 285,155 Z" />
+    <!-- Sensor Dome -->
+    <path android:fillColor="#E0F2FE" android:pathData="M310,180 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+
+    <!-- === WIRING CONNECTIONS (CIRCUIT NETS) === -->
+    <!-- Magenta Wire: ACS712 OUT -> Voltage Divider -> D34 -->
+    <path
+        android:strokeColor="#EC4899"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M108,58 H120 M152,48 H161" />
+
+    <!-- Blue Wire: Voltage Sensor 'S' -> D27 -->
+    <path
+        android:strokeColor="#3B82F6"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M108,115 C135,115 140,85 161,85" />
+
+    <!-- Purple Wire: DS18B20 DATA -> D4 -->
+    <path
+        android:strokeColor="#A855F7"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M250,80 C245,100 240,110 237,110" />
+
+    <!-- Blue I2C Line: SCL (D22) -> LCD SCL and BH1750 SCL -->
+    <path
+        android:strokeColor="#2563EB"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M237,42 H285 M275,42 V170 H285" />
+
+    <!-- Green I2C Line: SDA (D21) -> LCD SDA and BH1750 SDA -->
+    <path
+        android:strokeColor="#22C55E"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M237,52 H285 M270,52 V180 H285" />
+
+    <!-- Red 5V Power Lines from 5V Supply to ESP32 VIN, LCD, Sensors -->
+    <path
+        android:strokeColor="#EF4444"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M175,188 V164 M175,178 H135 V65 H108 M135,125 H108 M175,178 H265 V58 H285 M265,160 H285" />
+
+    <!-- Black Ground Lines (GND) -->
+    <path
+        android:strokeColor="#475569"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M190,188 V164 M190,172 H142 V75 H108 M142,135 H108 M190,172 H272 V68 H285 M272,190 H285" />
+
+    <!-- Load Connection (Top Left) -->
+    <path
+        android:strokeColor="#DC2626"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M10,20 L24,48" />
+    <path
+        android:strokeColor="#1E293B"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M5,30 L24,65" />
+</vector>
