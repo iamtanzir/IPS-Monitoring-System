@@ -2,6 +2,7 @@ package com.example
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +20,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 // Notification data class
+@Immutable
 data class SystemNotification(
     val id: String,
     val title: String,
@@ -28,6 +30,7 @@ data class SystemNotification(
 )
 
 // Data classes for Solar metrics
+@Immutable
 data class SolarMetrics(
     val isSolarOn: Boolean = true,
     val isChargingOn: Boolean = true,
@@ -83,6 +86,7 @@ data class SolarMetrics(
     val systemHealthScore: Int = 98
 )
 
+@Immutable
 data class GridHistoricalSummary(
     val dateLabel: String, // Today, Yesterday, Before yesterday
     val maxPvPower: Float,
@@ -113,6 +117,7 @@ data class GridHistoricalSummary(
     val co2SavedKg: Float = 3.16f
 )
 
+@Immutable
 data class EnergyPeriodStats(
     val period: String, // "Today", "Yesterday", "This Month", "Total"
     val savingsAmount: String, // "1,344"
@@ -129,6 +134,7 @@ data class EnergyPeriodStats(
     val exportAfterUsedKwh: Float
 )
 
+@Immutable
 data class CustomizerSettings(
     val customSolarName: String = "Universal IPS & Solar System",
     val selectedAccentHex: String = "#00E5FF", // Cyan default

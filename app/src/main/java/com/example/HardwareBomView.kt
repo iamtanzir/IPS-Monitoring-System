@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
 
+@Immutable
 data class BomItem(
     val id: String,
     val nameEn: String,
