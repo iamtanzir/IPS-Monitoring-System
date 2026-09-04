@@ -371,22 +371,7 @@ fun SolarSummaryView(
 
     // Hardware BOM Modal
     if (showHardwareBomModal) {
-        AlertDialog(
-            onDismissRequest = { showHardwareBomModal = false },
-            containerColor = Color(0xFF0F1218),
-            modifier = Modifier.fillMaxWidth(0.96f).fillMaxHeight(0.85f),
-            title = null,
-            text = {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    HardwareBomContent(modifier = Modifier.fillMaxSize())
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showHardwareBomModal = false }) {
-                    Text("Close", color = SolarCyan, fontWeight = FontWeight.Bold)
-                }
-            }
-        )
+        HardwareBomDialog(onDismiss = { showHardwareBomModal = false })
     }
 }
 
