@@ -113,6 +113,22 @@ data class GridHistoricalSummary(
     val co2SavedKg: Float = 3.16f
 )
 
+data class EnergyPeriodStats(
+    val period: String, // "Today", "Yesterday", "This Month", "Total"
+    val savingsAmount: String, // "1,344"
+    val currency: String = "Rs",
+    val solarEnergyKwh: Float,
+    val gridEnergyKwh: Float,
+    val solarChargingKwh: Float,
+    val gridChargingKwh: Float,
+    val batteryUsedKwh: Float,
+    val totalEnergyKwh: Float,
+    val loadConsumedKwh: Float,
+    val gridExportKwh: Float,
+    val gridImportKwh: Float,
+    val exportAfterUsedKwh: Float
+)
+
 data class CustomizerSettings(
     val customSolarName: String = "Universal IPS & Solar System",
     val selectedAccentHex: String = "#00E5FF", // Cyan default
@@ -335,6 +351,70 @@ class SolarViewModel(application: Application) : AndroidViewModel(application) {
             dailyConsumptionKwh = 2.80f,
             savingsBdt = 20.82f,
             co2SavedKg = 2.01f
+        )
+    )
+
+    // Energy Savings & Analytics per period (matching user's InverterZone format)
+    val energyPeriodStats = listOf(
+        EnergyPeriodStats(
+            period = "Today",
+            savingsAmount = "1,344",
+            currency = "Rs",
+            solarEnergyKwh = 22.4f,
+            gridEnergyKwh = 13.1f,
+            solarChargingKwh = 1.8f,
+            gridChargingKwh = 1.6f,
+            batteryUsedKwh = 0.0f,
+            totalEnergyKwh = 35.5f,
+            loadConsumedKwh = 19.0f,
+            gridExportKwh = 13.1f,
+            gridImportKwh = 13.1f,
+            exportAfterUsedKwh = 0.0f
+        ),
+        EnergyPeriodStats(
+            period = "Yesterday",
+            savingsAmount = "1,280",
+            currency = "Rs",
+            solarEnergyKwh = 21.2f,
+            gridEnergyKwh = 14.5f,
+            solarChargingKwh = 2.1f,
+            gridChargingKwh = 1.4f,
+            batteryUsedKwh = 0.5f,
+            totalEnergyKwh = 34.8f,
+            loadConsumedKwh = 18.5f,
+            gridExportKwh = 12.0f,
+            gridImportKwh = 14.5f,
+            exportAfterUsedKwh = 0.0f
+        ),
+        EnergyPeriodStats(
+            period = "This Month",
+            savingsAmount = "38,450",
+            currency = "Rs",
+            solarEnergyKwh = 642.0f,
+            gridEnergyKwh = 390.5f,
+            solarChargingKwh = 54.0f,
+            gridChargingKwh = 42.5f,
+            batteryUsedKwh = 12.0f,
+            totalEnergyKwh = 985.0f,
+            loadConsumedKwh = 540.0f,
+            gridExportKwh = 380.0f,
+            gridImportKwh = 390.5f,
+            exportAfterUsedKwh = 15.2f
+        ),
+        EnergyPeriodStats(
+            period = "Total",
+            savingsAmount = "2,45,600",
+            currency = "Rs",
+            solarEnergyKwh = 4120.0f,
+            gridEnergyKwh = 2840.0f,
+            solarChargingKwh = 360.0f,
+            gridChargingKwh = 310.0f,
+            batteryUsedKwh = 95.0f,
+            totalEnergyKwh = 6850.0f,
+            loadConsumedKwh = 3920.0f,
+            gridExportKwh = 2750.0f,
+            gridImportKwh = 2840.0f,
+            exportAfterUsedKwh = 112.0f
         )
     )
 

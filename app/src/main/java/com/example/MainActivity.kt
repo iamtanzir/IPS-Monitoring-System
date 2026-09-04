@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.theme.SolarBgDark
 import com.example.ui.theme.SolarCyan
@@ -119,10 +121,19 @@ class MainActivity : ComponentActivity() {
                                 bottom = innerPadding.calculateBottomPadding()
                             )
                     ) {
-                        when (selectedTabIndex) {
-                            0 -> SolarHomeView(viewModel = viewModel)
-                            1 -> SolarSummaryView(viewModel = viewModel)
-                            2 -> SolarSettingsView(viewModel = viewModel)
+                        Crossfade(
+                            targetState = selectedTabIndex,
+                            animationSpec = tween(300),
+                            label = "TabTransition"
+                        ) { tabIndex ->
+                            when (tabIndex) {
+                                0 -> SolarHomeView(viewModel = viewModel)
+                                1 -> SolarSummaryView(
+                                    viewModel = viewModel,
+                                    onNavigateTab = { selectedTabIndex = it }
+                                )
+                                2 -> SolarSettingsView(viewModel = viewModel)
+                            }
                         }
                     }
                 }

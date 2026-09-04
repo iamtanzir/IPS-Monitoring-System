@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.BluetoothSearching
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -144,7 +146,7 @@ fun SolarSettingsView(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = if (isPaired) Icons.Default.BluetoothConnected else Icons.Default.BluetoothSearching,
+                            imageVector = if (isPaired) Icons.Default.BluetoothConnected else Icons.AutoMirrored.Filled.BluetoothSearching,
                             contentDescription = "IoT Pair",
                             tint = if (isPaired) SolarGreen else SolarGold,
                             modifier = Modifier.size(20.dp)
@@ -1201,7 +1203,7 @@ fun HelpPairingGuideCard() {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.HelpOutline,
+                        imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                         contentDescription = "Help Guide",
                         tint = SolarCyan,
                         modifier = Modifier.size(22.dp)
@@ -1231,7 +1233,7 @@ fun HelpPairingGuideCard() {
 
             if (isExpanded) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Divider(color = SolarBorder.copy(alpha = 0.5f))
+                HorizontalDivider(color = SolarBorder.copy(alpha = 0.5f))
                 Spacer(modifier = Modifier.height(12.dp))
 
                 GuideStepItem(

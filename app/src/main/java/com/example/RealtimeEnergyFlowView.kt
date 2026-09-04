@@ -206,6 +206,7 @@ fun RealtimeEnergyFlowCard(
     onToggleSolar: () -> Unit,
     onToggleBattery: () -> Unit,
     onToggleGrid: () -> Unit,
+    onToggleLoad: () -> Unit,
     batteryType: String = "Tall Tubular Lead-Acid",
     onSelectBatteryType: (String) -> Unit = {},
     modifier: Modifier = Modifier
@@ -507,6 +508,7 @@ fun RealtimeEnergyFlowCard(
                     onToggleSolar = onToggleSolar,
                     onToggleBattery = onToggleBattery,
                     onToggleGrid = onToggleGrid,
+                    onToggleLoad = onToggleLoad,
                     onShowDetails = { showBatteryDetailsDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -700,6 +702,7 @@ private fun PowerStationHubSchematic(
     onToggleSolar: () -> Unit,
     onToggleBattery: () -> Unit,
     onToggleGrid: () -> Unit,
+    onToggleLoad: () -> Unit,
     onShowDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1141,8 +1144,8 @@ private fun PowerStationHubSchematic(
                             }
                         }
                         Switch(
-                            checked = metrics.isSolarOn,
-                            onCheckedChange = { onToggleSolar() },
+                            checked = metrics.isChargingOn,
+                            onCheckedChange = { onToggleBattery() },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.Black,
                                 checkedTrackColor = SolarCyan,
@@ -1179,7 +1182,7 @@ private fun PowerStationHubSchematic(
                         }
                         Switch(
                             checked = metrics.isLoadOn,
-                            onCheckedChange = { onToggleGrid() },
+                            onCheckedChange = { onToggleLoad() },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.Black,
                                 checkedTrackColor = SolarOrange,

@@ -322,7 +322,8 @@ fun SolarHomeView(
                 },
                 onToggleSolar = { viewModel.toggleSolarPower() },
                 onToggleBattery = { viewModel.toggleBatteryCharging() },
-                onToggleGrid = { viewModel.toggleGridPower() }
+                onToggleGrid = { viewModel.toggleGridPower() },
+                onToggleLoad = { viewModel.toggleLoad() }
             )
         }
 
@@ -483,7 +484,7 @@ fun SolarHomeView(
                         fontWeight = FontWeight.Medium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Divider(color = SolarBorder.copy(alpha = 0.5f))
+                    HorizontalDivider(color = SolarBorder.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
@@ -1360,7 +1361,7 @@ fun BatteryDetailsCard(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(color = SolarBorder.copy(alpha = 0.5f))
+            HorizontalDivider(color = SolarBorder.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(12.dp))
 
             // Capacity details row

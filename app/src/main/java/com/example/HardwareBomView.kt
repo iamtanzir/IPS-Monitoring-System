@@ -48,7 +48,7 @@ data class BomItem(
 fun HardwareBomDialog(
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    BasicAlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier
             .fillMaxWidth()
@@ -587,7 +587,7 @@ fun BomItemCard(item: BomItem) {
                         .fillMaxWidth()
                         .padding(top = 10.dp)
                 ) {
-                    Divider(color = SolarBorder.copy(alpha = 0.5f))
+                    HorizontalDivider(color = SolarBorder.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
